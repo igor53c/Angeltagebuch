@@ -21,11 +21,12 @@ class AngelplatzWindow : public QMainWindow {
   Q_OBJECT
 
 public:
-  explicit AngelplatzWindow(qint64 key, QWidget *parent = nullptr);
+  explicit AngelplatzWindow(QList<int> columnAngelplatzWidth, qint64 key, QWidget *parent = nullptr);
   ~AngelplatzWindow();
 
 signals:
   void dataModified(const qint64 key);
+  void columnWidthModified(const QList<int> list);
 
 private slots:
   void on_actionBEenden_triggered();
@@ -55,6 +56,7 @@ private:
   QString filterNiederschlag;
   QString filterNacht;
   QString filterParameter;
+  QList<int> columnAngelplatzWidth;
 
   void init();
   //  FischQSqlTableModel* getTableViewModel();

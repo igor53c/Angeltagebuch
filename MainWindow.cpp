@@ -18,6 +18,8 @@ void MainWindow::init() {
 
   angelplatzWindow = nullptr;
 
+  model = nullptr;
+
   // Einen Label für die ANzeige von Meldungen in der Statusbar erzeugen
   statusLabel = new QLabel(this);
 
@@ -27,6 +29,52 @@ void MainWindow::init() {
   // Der 2. Parameter stretch = 1 dehnt den Label
   // über die gesamte StatusBar aus.
   statusBar()->addWidget(statusLabel, 1);
+
+  // Menüeinträge als RadioButtons
+
+  // Die Menüeinträge zur Sprachauswahl sind checkable.
+  // Damit immer nur ein Eintrag ausgewählt werden kann
+  // (mutually exclusive) müssen sie in einer ActionGroup
+  // zusammengefasst werden.
+
+  QActionGroup *actionGroupLanguage = new QActionGroup(this);
+  actionGroupLanguage->addAction(ui->actionDeutsch);
+  actionGroupLanguage->addAction(ui->actionEnglisch);
+
+  // Übersetzer für Systemtexte erstellen
+  sysTranslator = new QTranslator(this);
+  sysTranslatorInstalled = false;
+
+  // Übersetzer für Englisch erstellen
+  enTranslator = new QTranslator(this);
+  enTranslatorInstalled = false;
+
+  // Übersetzungsdatei für Englisch aus dem Anwendungsverzeichnis laden
+  bool enLoaded = enTranslator->load(
+      QLocale::English,
+      QDir::currentPath() + QDir::separator() + "Angeltagebuch", "_");
+
+  if (!enLoaded) {
+    delete enTranslator;
+    enTranslator = nullptr;
+  }
+
+  // Datenbank öffnen
+  openDatabase();
+
+  for (int i = 0; i < AngelplaetzeDAO::countColumns(); i++)
+    columnMainWidth.push_back(150);
+
+  for (int i = 0; i < FischeDAO::countColumns(); i++)
+    columnAngelplatzWidth.push_back(100);
+
+  // Zuletzt verwendete Sprache aus der XML-Datei lesen
+  QString xmlConfigFilePath =
+      QDir::homePath() + "/AppData/Local/" + QApplication::applicationName();
+  xmlConfigFile =
+      xmlConfigFilePath + "/" + QApplication::applicationName() + ".xml";
+
+  readXMLSettings(xmlConfigFile);
 
   // Den Event Filter für die tableView installieren
   ui->tableView->installEventFilter(this);
@@ -39,9 +87,6 @@ void MainWindow::init() {
   palette.setColor(QPalette::Highlight, QColor(0, 112, 255));
 
   ui->tableView->setPalette(palette);
-
-  // Datenbank öffnen
-  openDatabase();
 
   // Anzeige aller Datensätze aus der Tabelle der Postleitzahlen
   showTable();
@@ -62,22 +107,28 @@ bool MainWindow::openDatabase() {
   return retValue;
 }
 
-QSqlTableModel *MainWindow::setTableViewModel() {
+void MainWindow::setTableViewModel() {
   // Evtl. vorhandenes QSqlTableModel löschen
   delete ui->tableView->model();
 
-  QSqlTableModel *model = AngelplaetzeDAO::readAngelplaetzeIntoTableModel();
+  model = AngelplaetzeDAO::readAngelplaetzeIntoTableModel();
 
   // Spaltenüberschriften der Tabelle setzen
   model->setHeaderData(model->record().indexOf("PATH"), Qt::Horizontal, "");
-  model->setHeaderData(model->record().indexOf("NAME"), Qt::Horizontal, "Name");
-  model->setHeaderData(model->record().indexOf("TYPE"), Qt::Horizontal, "Type");
-  model->setHeaderData(model->record().indexOf("FISCHE"), Qt::Horizontal, "Fische");
-  model->setHeaderData(model->record().indexOf("PLZ"), Qt::Horizontal, "PLZ");
-  model->setHeaderData(model->record().indexOf("ORT"), Qt::Horizontal, "Ort");
-  model->setHeaderData(model->record().indexOf("LAND"), Qt::Horizontal, "Land");
+  model->setHeaderData(model->record().indexOf("NAME"), Qt::Horizontal,
+                       tr("Name"));
+  model->setHeaderData(model->record().indexOf("TYPE"), Qt::Horizontal,
+                       tr("Typ"));
+  model->setHeaderData(model->record().indexOf("FISCHE"), Qt::Horizontal,
+                       tr("Fische"));
+  model->setHeaderData(model->record().indexOf("PLZ"), Qt::Horizontal,
+                       tr("PLZ"));
+  model->setHeaderData(model->record().indexOf("ORT"), Qt::Horizontal,
+                       tr("Ort"));
+  model->setHeaderData(model->record().indexOf("LAND"), Qt::Horizontal,
+                       tr("Land"));
   model->setHeaderData(model->record().indexOf("INFO"), Qt::Horizontal,
-                       "Zusätzliche Information");
+                       tr("Zusätzliche Information"));
 
   // Aufsteigende Sortierung nach Postleitzahl
   model->sort(model->record().indexOf("NAME"), Qt::AscendingOrder);
@@ -107,16 +158,17 @@ QSqlTableModel *MainWindow::setTableViewModel() {
   // Signal für die Änderung der Spaltenbreite in der TableView
   connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionResized, this,
           &MainWindow::tableView_section_resized);
-
-  return model;
 }
 
 void MainWindow::showTable() {
 
-  QSqlTableModel *model = setTableViewModel();
+  setTableViewModel();
 
   // Feste Höhe für die Tabellenüberschrift
   ui->tableView->horizontalHeader()->setFixedHeight(50);
+
+  for (int i = 0; i < columnMainWidth.size(); i++)
+    ui->tableView->setColumnWidth(i, columnMainWidth[i]);
 
   // Alle Spaltenüberschriften linksbündig
   ui->tableView->horizontalHeader()->setDefaultAlignment(
@@ -135,8 +187,9 @@ void MainWindow::showTable() {
   ui->actionAlleAngelpltze->setEnabled(ui->tableView->isEnabled());
 
   // Erste Zeile auswählen
-  ui->tableView->isEnabled() ? ui->tableView->selectRow(0)
-                             : statusLabel->setText("Der Datensatz ist leer.");
+  ui->tableView->isEnabled()
+      ? ui->tableView->selectRow(0)
+      : statusLabel->setText(tr("Der Datensatz ist leer."));
 }
 
 void MainWindow::showAngelplatzDialog(const qint64 key) {
@@ -153,17 +206,18 @@ void MainWindow::showAngelplatzDialog(const qint64 key) {
 void MainWindow::showAngelplatzWindow(const qint64 key) {
   delete angelplatzWindow;
 
-  angelplatzWindow = new AngelplatzWindow(key, this);
+  angelplatzWindow = new AngelplatzWindow(columnAngelplatzWidth, key, this);
 
   connect(angelplatzWindow, &AngelplatzWindow::dataModified, this,
           &MainWindow::refreshTableView);
+
+  connect(angelplatzWindow, &AngelplatzWindow::columnWidthModified, this,
+          &MainWindow::setColumnAngelplatzWidth);
 
   angelplatzWindow->show();
 }
 
 void MainWindow::deleteEntry(const QModelIndex &index) {
-  // Das Datenmodell der TableView in ein QSqlTableModel konvertieren
-  QSqlTableModel *model = static_cast<QSqlTableModel *>(ui->tableView->model());
 
   // Ermitteln des Primärschlüssels in Spalte 'PRIMARYKEY' über den als
   // Parameter übergebenen QModelIndex.
@@ -171,9 +225,9 @@ void MainWindow::deleteEntry(const QModelIndex &index) {
 
   int msgValue = QMessageBox::question(
       this, this->windowTitle(),
-      "Angelplatz löschen: " +
+      tr("Angelplatz löschen: ") +
           model->record(index.row()).value("NAME").toString() +
-          "\nAnzahl der zu löschenden Fische: " +
+          tr("\nAnzahl der zu löschenden Fische: ") +
           QString::number(FischeDAO::countFischeInAngelplatz(key)),
       QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
 
@@ -186,7 +240,7 @@ void MainWindow::deleteEntry(const QModelIndex &index) {
            : true) &&
       AngelplaetzeDAO::deleteAngelplatz(key)) {
 
-    statusLabel->setText("Einträge werden aktualisiert...");
+    statusLabel->setText(tr("Einträge werden aktualisiert..."));
 
     QApplication::processEvents();
 
@@ -200,13 +254,13 @@ void MainWindow::deleteEntry(const QModelIndex &index) {
       ui->tableView->selectRow(row);
 
     if (ui->tableView->model()->rowCount() == 0)
-      statusLabel->setText("Der Datensatz ist leer.");
+      statusLabel->setText(tr("Der Datensatz ist leer."));
   }
 }
 
 void MainWindow::refreshTableView(const qint64 key) {
 
-  statusLabel->setText("Einträge werden aktualisiert...");
+  statusLabel->setText(tr("Einträge werden aktualisiert..."));
   QApplication::processEvents();
 
   // Postleitzahlen neu in das Datenmodell einlesen
@@ -220,9 +274,6 @@ void MainWindow::findItemInTableView(const QString &columnName,
                                      const QVariant &value) {
   int row;
   bool found = false;
-
-  // Konvertieren des Datenmodells der tableView in ein SqlTableModel
-  QSqlTableModel *model = static_cast<QSqlTableModel *>(ui->tableView->model());
 
   // Auf die Query/Datensätze innerhalb des Datenmodells zugreifen
   QSqlQuery query = model->query();
@@ -265,9 +316,6 @@ void MainWindow::updateTableView(const qint64 key) {
 
   QModelIndex currentIndex = ui->tableView->currentIndex();
 
-  // Das Datenmodell der TableView in ein QSqlTableModel konvertieren
-  QSqlTableModel *model = static_cast<QSqlTableModel *>(ui->tableView->model());
-
   QModelIndex index;
 
   auto changeData = [&](QString column, auto data) {
@@ -283,7 +331,7 @@ void MainWindow::updateTableView(const qint64 key) {
   changeData("PATH", angelplatz->getPath());
   changeData("NAME", angelplatz->getName());
   changeData("TYPE", angelplatz->getType());
-  changeData("Fische", angelplatz->getFische());
+  changeData("FISCHE", angelplatz->getFische());
   changeData("PLZ", angelplatz->getPlz());
   changeData("ORT", angelplatz->getOrt());
   changeData("LAND", angelplatz->getLand());
@@ -306,23 +354,173 @@ void MainWindow::modifyTableView(const qint64 key,
   }
 }
 
+void MainWindow::setColumnAngelplatzWidth(const QList<int> list) {
+  columnAngelplatzWidth = list;
+}
+
 void MainWindow::tableView_selectionChanged() {
 
   int currentRow = ui->tableView->selectionModel()->currentIndex().row() + 1;
   int rowCount = ui->tableView->model()->rowCount();
 
-  QString msg = QString("Datensatz %L1 von %L2").arg(currentRow).arg(rowCount);
+  QString msg =
+      QString(tr("Datensatz %L1 von %L2")).arg(currentRow).arg(rowCount);
 
   statusLabel->setText(msg);
 }
 
 void MainWindow::tableView_section_resized(int index, int, int newSize) {
   // Nur auf die Änderung der 1 Spalte (Bild) reagieren
-  if (index == 1) {
-    // qDebug() << "newSize: " << newSize;
-    ui->tableView->verticalHeader()->setMinimumSectionSize(newSize);
-    ui->tableView->verticalHeader()->setMaximumSectionSize(newSize);
+  if (index == model->record().indexOf("PATH"))
+    ui->tableView->verticalHeader()->setDefaultSectionSize(newSize);
+
+  if (columnMainWidth.size() > index)
+    columnMainWidth[index] = newSize;
+}
+
+void MainWindow::loadLanguage(const QString &language) {
+
+  removeAllTranslators();
+
+  bool sysLoaded = false;
+
+  if (language.toLower() == "en" && enTranslator != nullptr) {
+    // Englische Systemtexte laden
+    sysLoaded = sysTranslator->load(
+        "qt_" + language, QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+
+    // Übersetzer für Englisch installieren
+    enTranslatorInstalled = QApplication::installTranslator(enTranslator);
+    ui->actionEnglisch->setChecked(true);
+    currentLanguage = language;
+  } else {
+    // Standardsprache ist Deutsch
+
+    // Deutsche Systemtexte laden
+    sysLoaded = sysTranslator->load(
+        "qt_de", QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+    ui->actionDeutsch->setChecked(true);
+    currentLanguage = "";
   }
+
+  if (sysLoaded)
+    sysTranslatorInstalled = QApplication::installTranslator(sysTranslator);
+}
+
+void MainWindow::removeAllTranslators() {
+  if (enTranslatorInstalled) {
+    QApplication::removeTranslator(enTranslator);
+    enTranslatorInstalled = false;
+  }
+
+  QApplication::removeTranslator(sysTranslator);
+  sysTranslatorInstalled = false;
+
+  // Aktuelle Sprache mit leerer Zeichenkette initialisieren (Standardsprache
+  // Deutsch)
+  currentLanguage = QString();
+}
+
+void MainWindow::readXMLSettings(const QString &filename) {
+  QString language;
+
+  // Datei öffnen
+  QFile file(filename);
+
+  if (!file.open(QFile::ReadOnly | QFile::Text))
+    return;
+
+  QXmlStreamReader xmlReader(&file);
+
+  do {
+    // Startelement lesen
+    if (xmlReader.readNextStartElement()) {
+      if (xmlReader.name() == QString("Settings")) {
+        do {
+          // Alle Einträge des Startelements lesen
+          xmlReader.readNext();
+
+          // Ist das Ende des aktuelle Startelements erreicht ?
+          if (xmlReader.isEndElement())
+            break;
+
+          if (xmlReader.name() == QString("Language"))
+            language = xmlReader.readElementText();
+
+          for (int i = 0; i < columnMainWidth.size(); i++)
+            if (xmlReader.name() == QString("ColumnMain%1").arg(i))
+              columnMainWidth[i] = xmlReader.readElementText().toInt();
+
+          for (int i = 0; i < columnAngelplatzWidth.size(); i++)
+            if (xmlReader.name() == QString("ColumnAngelplatz%1").arg(i))
+              columnAngelplatzWidth[i] = xmlReader.readElementText().toInt();
+
+        } while (!xmlReader.atEnd());
+      }
+    }
+  } while (!xmlReader.atEnd());
+
+  file.close();
+
+  loadLanguage(language);
+}
+
+void MainWindow::writeXMLSettings(const QString &filename) {
+
+  // Prüfen, ob das Verzeichnis existiert, wenn nicht erstellen.
+
+  QFileInfo fi(filename);
+
+  // Nur den Verzeichnisnamen aus dem Dateinamen extrahieren
+  QString xmlConfigFilePath = fi.absolutePath();
+
+  QDir dir(xmlConfigFilePath);
+  if (!dir.exists()) {
+    // QDir.mkpath() erstellt alle nicht existierende Verzeichnisse.
+    if (!dir.mkpath(xmlConfigFilePath)) {
+      QMessageBox::critical(this, this->windowTitle(),
+                            tr("Das Verzeichnis '") + xmlConfigFilePath +
+                                tr("' konnte nicht erstellt werden"));
+      return;
+    }
+  }
+
+  // Datei öffnen
+  QFile file(filename);
+
+  if (!file.open(QFile::WriteOnly | QFile::Text)) {
+    QMessageBox::critical(this, this->windowTitle(), file.errorString());
+    return;
+  }
+
+  QXmlStreamWriter xmlWriter(&file);
+
+  // Autom. Formatierung der XML-Datei
+  xmlWriter.setAutoFormatting(true);
+
+  // Schreibt die XML-Version 1.0 und die Information für die
+  // Kodierung/Dekodierung (UTF-8)
+  xmlWriter.writeStartDocument();
+
+  // Schreibt das Startelement (Knoten) der XML-Datei <Settings>
+  xmlWriter.writeStartElement("Settings");
+
+  // Schreibt das Textelement (Attribut) welches zu diesem Knoten gehört
+  // <Language>en</Language>
+  xmlWriter.writeTextElement("Language", currentLanguage);
+
+  for (int i = 0; i < columnMainWidth.size(); i++)
+    xmlWriter.writeTextElement(QString("ColumnMain%1").arg(i),
+                               QString::number(columnMainWidth[i]));
+
+  for (int i = 0; i < columnAngelplatzWidth.size(); i++)
+    xmlWriter.writeTextElement(QString("ColumnAngelplatz%1").arg(i),
+                               QString::number(columnAngelplatzWidth[i]));
+
+  // Beendet den Knoten </Settings>
+  xmlWriter.writeEndElement();
+
+  file.close();
 }
 
 bool MainWindow::eventFilter(QObject *sender, QEvent *event) {
@@ -355,6 +553,23 @@ bool MainWindow::eventFilter(QObject *sender, QEvent *event) {
   return QObject::eventFilter(sender, event);
 }
 
+// Das changeEvent wird durch installTranslator() ausgelöst
+// Wird aufgerufen, wenn die Sparche geändert wurde.
+void MainWindow::changeEvent(QEvent *event) {
+
+  if (event->type() == QEvent::LanguageChange)
+    ui->retranslateUi(this);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+
+  DAOLib::closeConnection();
+
+  writeXMLSettings(xmlConfigFile);
+
+  event->accept();
+}
+
 void MainWindow::on_actionBEenden_triggered() { close(); }
 
 void MainWindow::on_actionNeu_triggered() { showAngelplatzDialog(0); }
@@ -364,19 +579,13 @@ void MainWindow::on_actionLschen_triggered() {
 }
 
 void MainWindow::on_actionNdern_triggered() {
-  // Das Datenmodell der TableView in ein QSqlTableModel konvertieren
-  QSqlTableModel *model = static_cast<QSqlTableModel *>(ui->tableView->model());
 
-  // Den Index der selektierten Zeile ermitteln
-  QModelIndex index = ui->tableView->currentIndex();
-
-  showAngelplatzDialog(
-      model->record(index.row()).value("PRIMARYKEY").toLongLong());
+  showAngelplatzDialog(model->record(ui->tableView->currentIndex().row())
+                           .value("PRIMARYKEY")
+                           .toLongLong());
 }
 
 void MainWindow::on_tableView_doubleClicked(const QModelIndex &index) {
-  // Das Datenmodell der TableView in ein QSqlTableModel konvertieren
-  QSqlTableModel *model = static_cast<QSqlTableModel *>(ui->tableView->model());
 
   // Über den als Parameter übergebenen QModelIndex der selektierten Zeile
   // den Wert der Spalte PRIMARYKEY ermitten und als Parameter an die
@@ -387,8 +596,6 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index) {
 }
 
 void MainWindow::on_actionMarkierterAngelplatz_triggered() {
-  // Das Datenmodell der TableView in ein QSqlTableModel konvertieren
-  QSqlTableModel *model = static_cast<QSqlTableModel *>(ui->tableView->model());
 
   // Über den als Parameter übergebenen QModelIndex der selektierten Zeile
   // den Wert der Spalte PRIMARYKEY ermitten und als Parameter an die
@@ -403,8 +610,16 @@ void MainWindow::on_actionAlleAngelpltze_triggered() {
   showAngelplatzWindow(-1);
 }
 
-void MainWindow::closeEvent(QCloseEvent *event) {
+void MainWindow::on_actionDeutsch_triggered() {
 
-  DAOLib::closeConnection();
-  event->accept();
+  loadLanguage("");
+
+  showTable();
+}
+
+void MainWindow::on_actionEnglisch_triggered() {
+
+  loadLanguage("en");
+
+  showTable();
 }

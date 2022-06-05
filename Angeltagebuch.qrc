@@ -9,5 +9,6 @@
         <file>neu.png</file>
         <file>viewAll.png</file>
         <file>viewOne.png</file>
+        <file>languageIcon.png</file>
     </qresource>
 </RCC>

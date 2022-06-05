@@ -23,7 +23,8 @@ public:
   enum EditMode { NEW, UPDATE };
 
 signals:
-  void dataModified(const qint64 key, const EditMode editMode);
+  void dataModified(const qint64 key,
+                    const AngelplatzDialog::EditMode editMode);
 
 private slots:
   void on_btnAbbrechen_clicked();

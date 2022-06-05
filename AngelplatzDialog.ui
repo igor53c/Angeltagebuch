@@ -45,7 +45,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="AngelnTagebuch.qrc">:/imageIcon.png</pixmap>
+        <pixmap resource="Angeltagebuch.qrc">:/imageIcon.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -256,7 +256,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Type:</string>
+        <string>Typ:</string>
        </property>
       </widget>
      </item>
@@ -400,7 +400,7 @@
   <tabstop>btnAbbrechen</tabstop>
  </tabstops>
  <resources>
-  <include location="AngelnTagebuch.qrc"/>
+  <include location="Angeltagebuch.qrc"/>
  </resources>
  <connections/>
 </ui>

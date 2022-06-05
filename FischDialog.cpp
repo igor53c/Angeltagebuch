@@ -18,12 +18,11 @@ void FischDialog::init() {
 
   ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
 
-  ui->cbNiederschlag->addItems(QStringList() << "Sonnig"
-                                             << "Wolkig"
-                                             << "Regen"
-                                             << "Schnee");
+  ui->cbNiederschlag->addItems(QStringList() << tr("Sonnig") << tr("Wolkig")
+                                             << tr("Regen") << tr("Schnee"));
 
-  ui->cbFischarten->addItems(FischeDAO::readFischarten());
+  ui->cbFischarten->addItems(QStringList() << tr("Fischarten")
+                                           << FischeDAO::readFischarten());
 
   if (dlgKey > 0) {
     readEntry(dlgKey);
@@ -67,7 +66,7 @@ void FischDialog::readEntry(qint64 key) {
   ui->sbTemperatur->setValue(fisch->getTemperatur());
   ui->sbWindgeschwindigkeit->setValue(fisch->getWindgeschwindigkeit());
   ui->sbLuftdruck->setValue(fisch->getLuftdruck());
-  ui->checkNacht->setChecked(fisch->getIsNacht() == "Ja");
+  ui->checkNacht->setChecked(fisch->getIsNacht() == tr("Ja"));
   ui->cbNiederschlag->setCurrentText(fisch->getNiederschlag());
   ui->textInfo->setText(fisch->getInfo());
 
@@ -79,15 +78,15 @@ bool FischDialog::saveEntry() {
 
   bool retValue = false;
 
-  if (!QString::compare(ui->cbFischarten->currentText(), "Fischarten") &&
+  if (!QString::compare(ui->cbFischarten->currentText(), tr("Fischarten")) &&
       ui->textFischarten->text().isEmpty()) {
-    QMessageBox::critical(this, this->windowTitle(), "Eingabe fehlt");
+    QMessageBox::critical(this, this->windowTitle(), tr("Eingabe fehlt"));
     ui->textFischarten->setFocus();
     return retValue;
   }
 
   QString name =
-      !QString::compare(ui->cbFischarten->currentText(), "Fischarten")
+      !QString::compare(ui->cbFischarten->currentText(), tr("Fischarten"))
           ? ui->textFischarten->text()
           : ui->cbFischarten->currentText();
 
@@ -117,7 +116,7 @@ bool FischDialog::querySave() {
 
   int msgValue = QMessageBox::warning(
       this, this->windowTitle(),
-      "Daten wurden geändert.\nSollen die Änderungen gespeichert werden?",
+      tr("Daten wurden geändert.\nSollen die Änderungen gespeichert werden?"),
       QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
       QMessageBox::Cancel);
 
@@ -149,7 +148,8 @@ bool FischDialog::updateEntry(QString &name, qint64 key) {
       key, imagePath, name, angelplatzKey, ui->sbLaenge->value(),
       ui->sbGewicht->value(), ui->dateTimeEdit->dateTime(),
       ui->sbTemperatur->value(), ui->sbWindgeschwindigkeit->value(),
-      ui->sbLuftdruck->value(), ui->checkNacht->isChecked() ? "Ja" : "Nein",
+      ui->sbLuftdruck->value(),
+      ui->checkNacht->isChecked() ? tr("Ja") : tr("Nein"),
       ui->cbNiederschlag->currentText(), ui->textInfo->toPlainText());
 }
 
@@ -158,18 +158,20 @@ bool FischDialog::insertEntry(QString &name) {
       imagePath, name, angelplatzKey, ui->sbLaenge->value(),
       ui->sbGewicht->value(), ui->dateTimeEdit->dateTime(),
       ui->sbTemperatur->value(), ui->sbWindgeschwindigkeit->value(),
-      ui->sbLuftdruck->value(), ui->checkNacht->isChecked() ? "Ja" : "Nein",
+      ui->sbLuftdruck->value(),
+      ui->checkNacht->isChecked() ? tr("Ja") : tr("Nein"),
       ui->cbNiederschlag->currentText(), ui->textInfo->toPlainText());
 }
 
 void FischDialog::importImage() {
   // Gibt das Heimverzeichnis des Benutzers zurück
-  QString defaultFilter = "Alle Bilddateien (*.jpeg *.jpg *.bmp *.png *.jfif)";
+  QString defaultFilter =
+      tr("Alle Bilddateien (*.jpeg *.jpg *.bmp *.png *.jfif)");
 
   // Dateiauswahl Dialog
   QString newImagePath = QFileDialog::getOpenFileName(
-      this, "Bild hochladen", QDir::currentPath(),
-      "Alle Dateien (*.*);;" + defaultFilter, &defaultFilter);
+      this, tr("Bild hochladen"), QDir::currentPath(),
+      tr("Alle Dateien (*.*);;") + defaultFilter, &defaultFilter);
 
   if (newImagePath.isEmpty())
     return;
@@ -205,9 +207,9 @@ void FischDialog::on_cbFischarten_currentTextChanged(const QString &text) {
 
   isModified = true;
 
-  ui->textFischarten->setVisible(!QString::compare(text, "Fischarten"));
+  ui->textFischarten->setVisible(!QString::compare(text, tr("Fischarten")));
 
-  ui->lblFischartenSpace->setVisible(QString::compare(text, "Fischarten"));
+  ui->lblFischartenSpace->setVisible(QString::compare(text, tr("Fischarten")));
 }
 
 void FischDialog::on_textFischarten_textChanged(const QString &) {

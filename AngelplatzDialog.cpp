@@ -87,7 +87,7 @@ bool AngelplatzDialog::querySave() {
 
   int msgValue = QMessageBox::warning(
       this, this->windowTitle(),
-      "Daten wurden geändert.\nSollen die Änderungen gespeichert werden?",
+      tr("Daten wurden geändert.\nSollen die Änderungen gespeichert werden?"),
       QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
       QMessageBox::Cancel);
 
@@ -115,12 +115,12 @@ bool AngelplatzDialog::entryIsValid() {
   };
 
   if (ui->textName->text().isEmpty())
-    message(ui->textName, "Eingabe fehlt");
+    message(ui->textName, tr("Eingabe fehlt"));
   else if (ui->textType->text().isEmpty())
-    message(ui->textType, "Eingabe fehlt");
+    message(ui->textType, tr("Eingabe fehlt"));
   else if (dlgKey < 1 &&
            AngelplaetzeDAO::angelplatzExists(ui->textName->text()))
-    message(ui->textName, "Der Angelplatz ist bereits vorhanden");
+    message(ui->textName, tr("Der Angelplatz ist bereits vorhanden"));
 
   return retValue;
 }
@@ -151,12 +151,13 @@ bool AngelplatzDialog::insertEntry() {
 
 void AngelplatzDialog::importImage() {
   // Gibt das Heimverzeichnis des Benutzers zurück
-  QString defaultFilter = "Alle Bilddateien (*.jpeg *.jpg *.bmp *.png *.jfif)";
+  QString defaultFilter =
+      tr("Alle Bilddateien (*.jpeg *.jpg *.bmp *.png *.jfif)");
 
   // Dateiauswahl Dialog
   QString newImagePath = QFileDialog::getOpenFileName(
-      this, "Bild hochladen", QDir::currentPath(),
-      "Alle Dateien (*.*);;" + defaultFilter, &defaultFilter);
+      this, tr("Bild hochladen"), QDir::currentPath(),
+      tr("Alle Dateien (*.*);;") + defaultFilter, &defaultFilter);
 
   if (newImagePath.isEmpty())
     return;

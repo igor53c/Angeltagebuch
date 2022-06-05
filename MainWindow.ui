@@ -28,10 +28,10 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Angeln Tagebuch</string>
+   <string>Angeltagebuch</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="AngelnTagebuch.qrc">
+   <iconset resource="Angeltagebuch.qrc">
     <normaloff>:/appIcon.png</normaloff>:/appIcon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -75,7 +75,7 @@
        <bool>true</bool>
       </property>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>150</number>
+       <number>0</number>
       </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>150</number>
@@ -90,7 +90,7 @@
        <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderMinimumSectionSize">
-       <number>150</number>
+       <number>0</number>
       </attribute>
       <attribute name="verticalHeaderDefaultSectionSize">
        <number>150</number>
@@ -124,14 +124,32 @@
    </widget>
    <widget class="QMenu" name="menuDaten">
     <property name="title">
-     <string>&amp;Daten</string>
+     <string>Da&amp;ten</string>
     </property>
     <addaction name="actionMarkierterAngelplatz"/>
     <addaction name="actionAlleAngelpltze"/>
    </widget>
+   <widget class="QMenu" name="menuExtras">
+    <property name="title">
+     <string>E&amp;xtras</string>
+    </property>
+    <widget class="QMenu" name="menuSprache">
+     <property name="title">
+      <string>&amp;Sprache</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Angeltagebuch.qrc">
+       <normaloff>:/languageIcon.png</normaloff>:/languageIcon.png</iconset>
+     </property>
+     <addaction name="actionDeutsch"/>
+     <addaction name="actionEnglisch"/>
+    </widget>
+    <addaction name="menuSprache"/>
+   </widget>
    <addaction name="menuAngelplatz"/>
    <addaction name="menuBearbeiten"/>
    <addaction name="menuDaten"/>
+   <addaction name="menuExtras"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="minimumSize">
@@ -172,43 +190,55 @@
   </widget>
   <action name="actionBEenden">
    <property name="icon">
-    <iconset resource="AngelnTagebuch.qrc">
+    <iconset resource="Angeltagebuch.qrc">
      <normaloff>:/beenden.png</normaloff>:/beenden.png</iconset>
    </property>
    <property name="text">
     <string>B&amp;eenden</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
   </action>
   <action name="actionNeu">
    <property name="icon">
-    <iconset resource="AngelnTagebuch.qrc">
+    <iconset resource="Angeltagebuch.qrc">
      <normaloff>:/neu.png</normaloff>:/neu.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Neu...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionNdern">
    <property name="icon">
-    <iconset resource="AngelnTagebuch.qrc">
+    <iconset resource="Angeltagebuch.qrc">
      <normaloff>:/aendern.png</normaloff>:/aendern.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Ändern...</string>
+    <string>Ä&amp;ndern...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="actionLschen">
    <property name="icon">
-    <iconset resource="AngelnTagebuch.qrc">
+    <iconset resource="Angeltagebuch.qrc">
      <normaloff>:/loeschen.png</normaloff>:/loeschen.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Löschen</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
   </action>
   <action name="actionMarkierterAngelplatz">
    <property name="icon">
-    <iconset resource="AngelnTagebuch.qrc">
+    <iconset resource="Angeltagebuch.qrc">
      <normaloff>:/viewOne.png</normaloff>:/viewOne.png</iconset>
    </property>
    <property name="text">
@@ -217,16 +247,35 @@
   </action>
   <action name="actionAlleAngelpltze">
    <property name="icon">
-    <iconset resource="AngelnTagebuch.qrc">
+    <iconset resource="Angeltagebuch.qrc">
      <normaloff>:/viewAll.png</normaloff>:/viewAll.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Alle Angelplätze</string>
    </property>
   </action>
+  <action name="actionDeutsch">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Deutsch</string>
+   </property>
+  </action>
+  <action name="actionEnglisch">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Englisch</string>
+   </property>
+  </action>
  </widget>
  <resources>
-  <include location="AngelnTagebuch.qrc"/>
+  <include location="Angeltagebuch.qrc"/>
  </resources>
  <connections/>
 </ui>
