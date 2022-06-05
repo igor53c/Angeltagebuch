@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>imageIcon.png</file>
+        <file>logo.png</file>
+        <file>appIcon.png</file>
+        <file>aendern.png</file>
+        <file>beenden.png</file>
+        <file>loeschen.png</file>
+        <file>neu.png</file>
+        <file>viewAll.png</file>
+        <file>viewOne.png</file>
+    </qresource>
+</RCC>

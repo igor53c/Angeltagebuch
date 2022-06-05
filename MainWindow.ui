@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Angeln Tagebuch</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="AngelnTagebuch.qrc">
+    <normaloff>:/appIcon.png</normaloff>:/appIcon.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTableView" name="tableView">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QHeaderView::section{
+           border-top:0px solid #D8D8D8;
+            border-left:0px solid #D8D8D8;
+            border-right:1px solid #D8D8D8;
+            border-bottom: 1px solid #D8D8D8;
+            background-color:white;
+            padding:4px;
+            font: bold 18px;
+        }
+</string>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideMiddle</enum>
+      </property>
+      <property name="showGrid">
+       <bool>true</bool>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>150</number>
+      </attribute>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>150</number>
+      </attribute>
+      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderMinimumSectionSize">
+       <number>150</number>
+      </attribute>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>150</number>
+      </attribute>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAngelplatz">
+    <property name="title">
+     <string>&amp;Datei</string>
+    </property>
+    <addaction name="actionBEenden"/>
+   </widget>
+   <widget class="QMenu" name="menuBearbeiten">
+    <property name="title">
+     <string>&amp;Bearbeiten</string>
+    </property>
+    <addaction name="actionNeu"/>
+    <addaction name="actionNdern"/>
+    <addaction name="actionLschen"/>
+   </widget>
+   <widget class="QMenu" name="menuDaten">
+    <property name="title">
+     <string>&amp;Daten</string>
+    </property>
+    <addaction name="actionMarkierterAngelplatz"/>
+    <addaction name="actionAlleAngelpltze"/>
+   </widget>
+   <addaction name="menuAngelplatz"/>
+   <addaction name="menuBearbeiten"/>
+   <addaction name="menuDaten"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>25</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNeu"/>
+   <addaction name="actionNdern"/>
+   <addaction name="actionLschen"/>
+   <addaction name="separator"/>
+   <addaction name="actionMarkierterAngelplatz"/>
+   <addaction name="actionAlleAngelpltze"/>
+  </widget>
+  <action name="actionBEenden">
+   <property name="icon">
+    <iconset resource="AngelnTagebuch.qrc">
+     <normaloff>:/beenden.png</normaloff>:/beenden.png</iconset>
+   </property>
+   <property name="text">
+    <string>B&amp;eenden</string>
+   </property>
+  </action>
+  <action name="actionNeu">
+   <property name="icon">
+    <iconset resource="AngelnTagebuch.qrc">
+     <normaloff>:/neu.png</normaloff>:/neu.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Neu...</string>
+   </property>
+  </action>
+  <action name="actionNdern">
+   <property name="icon">
+    <iconset resource="AngelnTagebuch.qrc">
+     <normaloff>:/aendern.png</normaloff>:/aendern.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Ändern...</string>
+   </property>
+  </action>
+  <action name="actionLschen">
+   <property name="icon">
+    <iconset resource="AngelnTagebuch.qrc">
+     <normaloff>:/loeschen.png</normaloff>:/loeschen.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Löschen</string>
+   </property>
+  </action>
+  <action name="actionMarkierterAngelplatz">
+   <property name="icon">
+    <iconset resource="AngelnTagebuch.qrc">
+     <normaloff>:/viewOne.png</normaloff>:/viewOne.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Markierter Angelplatz</string>
+   </property>
+  </action>
+  <action name="actionAlleAngelpltze">
+   <property name="icon">
+    <iconset resource="AngelnTagebuch.qrc">
+     <normaloff>:/viewAll.png</normaloff>:/viewAll.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Alle Angelplätze</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="AngelnTagebuch.qrc"/>
+ </resources>
+ <connections/>
+</ui>
