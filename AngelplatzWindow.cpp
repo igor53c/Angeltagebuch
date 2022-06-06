@@ -1,12 +1,12 @@
 #include "AngelplatzWindow.h"
 #include "ui_AngelplatzWindow.h"
 
-AngelplatzWindow::AngelplatzWindow(QList<int> columnAngelplatzWidth, qint64 key,
-                                   QWidget *parent)
+AngelplatzWindow::AngelplatzWindow(QList<int> columnAngelplatzWidth,
+                                   QString &angelplatzName, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::AngelplatzWindow) {
   ui->setupUi(this);
 
-  windowKey = key;
+  this->angelplatzName = angelplatzName;
 
   this->columnAngelplatzWidth = columnAngelplatzWidth;
 
@@ -22,9 +22,6 @@ void AngelplatzWindow::init() {
   model = nullptr;
 
   proxyModel = nullptr;
-
-  if (windowKey < 1)
-    ui->actionNeu->setDisabled(true);
 
   // Einen Label für die ANzeige von Meldungen in der Statusbar erzeugen
   statusLabel = new QLabel(this);
@@ -46,16 +43,20 @@ void AngelplatzWindow::init() {
   palette.setColor(QPalette::HighlightedText, Qt::white);
   palette.setColor(QPalette::Highlight, QColor(0, 112, 255));
 
+  listNacht = QStringList() << tr("Ja") << tr("Nein");
+
+  listNiederschlag = QStringList() << tr("Sonnig") << tr("Wolkig")
+                                   << tr("Regen") << tr("Schnee");
+
   ui->tableView->setPalette(palette);
 
   ui->cbFischarten->addItems(QStringList() << tr("Fischarten")
                                            << FischeDAO::readFischarten());
 
   ui->cbNiederschlag->addItems(QStringList()
-                               << tr("Niederschlag") << tr("Sonnig")
-                               << tr("Wolkig") << tr("Regen") << tr("Schnee"));
+                               << tr("Niederschlag") << listNiederschlag);
 
-  ui->cbNacht->addItems(QStringList() << tr("Nacht") << tr("Ja") << tr("Nein"));
+  ui->cbNacht->addItems(QStringList() << tr("Nacht") << listNacht);
 
   ui->cbParameter->addItems(QStringList()
                             << tr("Parameter") << tr("Länge") << tr("Gewicht")
@@ -64,8 +65,8 @@ void AngelplatzWindow::init() {
 
   showParameterFilter(false, false, false);
 
-  if (windowKey > 0)
-    readEntry(windowKey);
+  angelplatzName.isEmpty() ? ui->actionNeu->setVisible(false)
+                           : readEntry(angelplatzName);
 
   showTable();
 }
@@ -74,7 +75,7 @@ void AngelplatzWindow::setTableViewModel() {
   // Evtl. vorhandenes QSqlTableModel löschen
   delete ui->tableView->model();
 
-  model = FischeDAO::readFischeIntoTableModel();
+  model = FischeDAO::readFischeIntoTableModel(listNacht, listNiederschlag);
 
   proxyModel = new SortFilterProxyModel(this);
 
@@ -111,7 +112,7 @@ void AngelplatzWindow::setTableViewModel() {
   ui->tableView->setItemDelegateForColumn(model->record().indexOf("PATH"),
                                           delegate);
 
-  proxyModel->setAngelplatz(windowKey);
+  proxyModel->setAngelplatz(angelplatzName);
   proxyModel->setAngelplatzColumn(model->record().indexOf("ANGELPLATZ"));
 
   if (!filterFischarten.isEmpty()) {
@@ -129,36 +130,32 @@ void AngelplatzWindow::setTableViewModel() {
     proxyModel->setNachtColumn(model->record().indexOf("IS_NACHT"));
   }
 
-  if (!filterParameter.isEmpty()) {
+  proxyModel->setParameter(filterParameter);
+  proxyModel->setParameterMin(ui->sbMin->value());
+  proxyModel->setParameterMax(ui->sbMax->value());
+  proxyModel->setZeitMin(ui->dateTimeMin->dateTime());
+  proxyModel->setZeitMax(ui->dateTimeMax->dateTime());
 
-    proxyModel->setParameter(filterParameter);
-
-    if (filterParameter == tr("Länge")) {
-      proxyModel->setParameterMin(ui->sbMin->value());
-      proxyModel->setParameterMax(ui->sbMax->value());
-      proxyModel->setParameterColumn(model->record().indexOf("LAENGE"));
-    } else if (filterParameter == tr("Gewicht")) {
-      proxyModel->setParameterMin(ui->sbMin->value());
-      proxyModel->setParameterMax(ui->sbMax->value());
-      proxyModel->setParameterColumn(model->record().indexOf("GEWICHT"));
-    } else if (filterParameter == tr("Zeit")) {
-      proxyModel->setZeitMin(ui->dateTimeMin->dateTime());
-      proxyModel->setZeitMax(ui->dateTimeMax->dateTime());
-      proxyModel->setParameterColumn(model->record().indexOf("ZEIT"));
-    } else if (filterParameter == tr("Temperatur")) {
-      proxyModel->setParameterMin(ui->sbMin->value());
-      proxyModel->setParameterMax(ui->sbMax->value());
-      proxyModel->setParameterColumn(model->record().indexOf("TEMPERATUR"));
-    } else if (filterParameter == tr("Windgeschwindigkeit")) {
-      proxyModel->setParameterMin(ui->sbMin->value());
-      proxyModel->setParameterMax(ui->sbMax->value());
-      proxyModel->setParameterColumn(
-          model->record().indexOf("WINDGESCHWINDIGKEIT"));
-    } else if (filterParameter == tr("Luftdruck")) {
-      proxyModel->setParameterMin(ui->sbMin->value());
-      proxyModel->setParameterMax(ui->sbMax->value());
-      proxyModel->setParameterColumn(model->record().indexOf("LUFTDRUCK"));
-    }
+  switch (filterParameter) {
+  case 1:
+    proxyModel->setParameterColumn(model->record().indexOf("LAENGE"));
+    break;
+  case 2:
+    proxyModel->setParameterColumn(model->record().indexOf("GEWICHT"));
+    break;
+  case 3:
+    proxyModel->setParameterColumn(model->record().indexOf("ZEIT"));
+    break;
+  case 4:
+    proxyModel->setParameterColumn(model->record().indexOf("TEMPERATUR"));
+    break;
+  case 5:
+    proxyModel->setParameterColumn(
+        model->record().indexOf("WINDGESCHWINDIGKEIT"));
+    break;
+  case 6:
+    proxyModel->setParameterColumn(model->record().indexOf("LUFTDRUCK"));
+    break;
   }
 
   // Das Datenmodel zur tableView zuweisen
@@ -203,7 +200,6 @@ void AngelplatzWindow::showTable() {
 
   // Spalte PRIMARYKEY unsichtbar machen
   ui->tableView->hideColumn(model->record().indexOf("PRIMARYKEY"));
-  ui->tableView->hideColumn(model->record().indexOf("ANGELPLATZ"));
 
   // Aktivieren/Deaktivieren der Komponenten, abhängig davon,
   // ob Datensätze gelesen wurden.
@@ -217,28 +213,24 @@ void AngelplatzWindow::showTable() {
       : statusLabel->setText(tr("Der Datensatz ist leer."));
 }
 
-void AngelplatzWindow::readEntry(qint64 key) {
-  Angelplatz *angelplatz = AngelplaetzeDAO::readAngelplatz(key);
-
-  if (angelplatz == nullptr)
-    return;
+void AngelplatzWindow::readEntry(const QString &name) {
 
   ui->image->setScaledContents(false);
 
-  ui->image->setPixmap(QPixmap::fromImage(QImage(angelplatz->getPath()))
-                           .scaled(ui->image->width(), ui->image->height(),
-                                   Qt::KeepAspectRatio,
-                                   Qt::SmoothTransformation));
+  QString path = AngelplaetzeDAO::readAngelplatzPath(name);
 
-  ui->lblAngelplatzInfo->setText(angelplatz->getName());
+  if (!path.isEmpty())
+    ui->image->setPixmap(QPixmap::fromImage(QImage(path))
+                             .scaled(ui->image->width(), ui->image->height(),
+                                     Qt::KeepAspectRatio,
+                                     Qt::SmoothTransformation));
 
-  // Objekt plz vom Heap löschen
-  delete angelplatz;
+  ui->lblAngelplatzInfo->setText(name);
 }
 
 void AngelplatzWindow::showFischDialog(const qint64 key) {
   // Dialog auf dem Stack erstellen
-  FischDialog fischDialog(windowKey, key, this);
+  FischDialog fischDialog(angelplatzName, key, this);
 
   connect(&fischDialog, &FischDialog::dataModified, this,
           &AngelplatzWindow::modifyTableView);
@@ -266,21 +258,16 @@ void AngelplatzWindow::deleteEntry(const QModelIndex &index) {
   if (msgValue == QMessageBox::Cancel)
     return;
 
-  qint64 angelplatzKey = windowKey;
+  QString angelplatzKey = angelplatzName;
 
-  if (windowKey < 1) {
-    Fisch *fisch = FischeDAO::readFisch(key);
-
-    angelplatzKey = fisch->getAngelplatz();
-
-    delete fisch;
-  }
+  if (angelplatzName.isEmpty())
+    angelplatzKey = FischeDAO::readFischAngelplatz(key);
 
   // Löschen der Postleitzahl über den Primärschlüssel
   if (FischeDAO::deleteFisch(key) &&
       AngelplaetzeDAO::changeNumberFische(angelplatzKey, -1)) {
 
-    emit dataModified(angelplatzKey);
+    emit dataModified(AngelplaetzeDAO::readAngelplatzKey(angelplatzKey));
 
     statusLabel->setText(tr("Einträge werden aktualisiert..."));
     QApplication::processEvents();
@@ -304,9 +291,9 @@ void AngelplatzWindow::refreshTableView(const qint64 key) {
   statusLabel->setText(tr("Einträge werden aktualisiert..."));
   QApplication::processEvents();
 
-  AngelplaetzeDAO::changeNumberFische(windowKey, 1);
+  AngelplaetzeDAO::changeNumberFische(angelplatzName, 1);
 
-  emit dataModified(windowKey);
+  emit dataModified(AngelplaetzeDAO::readAngelplatzKey(angelplatzName));
 
   ui->cbFischarten->clear();
   ui->cbFischarten->addItems(FischeDAO::readFischarten());
@@ -429,8 +416,6 @@ void AngelplatzWindow::tableView_section_resized(int index, int, int newSize) {
 
   if (columnAngelplatzWidth.size() > index)
     columnAngelplatzWidth[index] = newSize;
-
-  emit columnWidthModified(columnAngelplatzWidth);
 }
 
 void AngelplatzWindow::tableView_selectionChanged() {
@@ -472,6 +457,13 @@ bool AngelplatzWindow::eventFilter(QObject *sender, QEvent *event) {
   }
 
   return QObject::eventFilter(sender, event);
+}
+
+void AngelplatzWindow::closeEvent(QCloseEvent *event) {
+
+  emit columnWidthModified(columnAngelplatzWidth);
+
+  event->accept();
 }
 
 void AngelplatzWindow::on_actionBEenden_triggered() { close(); }
@@ -522,63 +514,52 @@ void AngelplatzWindow::on_cbNacht_currentTextChanged(const QString &text) {
   showTable();
 }
 
-void AngelplatzWindow::on_cbParameter_currentTextChanged(const QString &text) {
+void AngelplatzWindow::on_cbParameter_currentIndexChanged(int index) {
 
-  if (text == tr("Parameter")) {
+  auto setMinMax = [&](int min, int max) {
+    ui->sbMin->setRange(min, max);
+    ui->sbMin->setValue(min);
+    ui->sbMax->setRange(min, max);
+    ui->sbMax->setValue(max);
+  };
 
-    showParameterFilter(false, false, false);
+  index == 0   ? showParameterFilter(false, false, false)
+  : index == 3 ? showParameterFilter(false, true, true)
+               : showParameterFilter(true, false, true);
 
-    filterParameter = QString();
-  } else {
+  switch (index) {
+  case 1:
+    setMinMax(FischeDAO::getMinParameter("LAENGE").toInt(),
+              FischeDAO::getMaxParameter("LAENGE").toInt());
+    break;
+  case 2:
+    setMinMax(FischeDAO::getMinParameter("GEWICHT").toInt(),
+              FischeDAO::getMaxParameter("GEWICHT").toInt());
+    break;
+  case 3: {
+    QDateTime min = FischeDAO::getMinParameter("ZEIT").toDateTime();
+    QDateTime max = FischeDAO::getMaxParameter("ZEIT").toDateTime();
 
-    auto setMinMax = [&](int min, int max) {
-      ui->sbMin->setRange(min, max);
-      ui->sbMin->setValue(min);
-      ui->sbMax->setRange(min, max);
-      ui->sbMax->setValue(max);
-    };
-
-    if (text == tr("Länge")) {
-
-      setMinMax(FischeDAO::getMinParameter("LAENGE").toInt(),
-                FischeDAO::getMaxParameter("LAENGE").toInt());
-
-    } else if (text == tr("Gewicht")) {
-
-      setMinMax(FischeDAO::getMinParameter("GEWICHT").toInt(),
-                FischeDAO::getMaxParameter("GEWICHT").toInt());
-
-    } else if (text == tr("Zeit")) {
-
-      QDateTime min = FischeDAO::getMinParameter("ZEIT").toDateTime();
-      QDateTime max = FischeDAO::getMaxParameter("ZEIT").toDateTime();
-
-      ui->dateTimeMin->setDateTimeRange(min, max);
-      ui->dateTimeMin->setDateTime(min);
-      ui->dateTimeMax->setDateTimeRange(min, max);
-      ui->dateTimeMax->setDateTime(max);
-
-    } else if (text == tr("Temperatur")) {
-
-      setMinMax(FischeDAO::getMinParameter("TEMPERATUR").toInt(),
-                FischeDAO::getMaxParameter("TEMPERATUR").toInt());
-
-    } else if (text == tr("Windgeschwindigkeit")) {
-
-      setMinMax(FischeDAO::getMinParameter("WINDGESCHWINDIGKEIT").toInt(),
-                FischeDAO::getMaxParameter("WINDGESCHWINDIGKEIT").toInt());
-
-    } else if (text == tr("Luftdruck")) {
-
-      setMinMax(FischeDAO::getMinParameter("LUFTDRUCK").toInt(),
-                FischeDAO::getMaxParameter("LUFTDRUCK").toInt());
-    }
-
-    text == tr("Zeit") ? showParameterFilter(false, true, true)
-                       : showParameterFilter(true, false, true);
-
-    filterParameter = text;
+    ui->dateTimeMin->setDateTimeRange(min, max);
+    ui->dateTimeMin->setDateTime(min);
+    ui->dateTimeMax->setDateTimeRange(min, max);
+    ui->dateTimeMax->setDateTime(max);
+  } break;
+  case 4:
+    setMinMax(FischeDAO::getMinParameter("TEMPERATUR").toInt(),
+              FischeDAO::getMaxParameter("TEMPERATUR").toInt());
+    break;
+  case 5:
+    setMinMax(FischeDAO::getMinParameter("WINDGESCHWINDIGKEIT").toInt(),
+              FischeDAO::getMaxParameter("WINDGESCHWINDIGKEIT").toInt());
+    break;
+  case 6:
+    setMinMax(FischeDAO::getMinParameter("LUFTDRUCK").toInt(),
+              FischeDAO::getMaxParameter("LUFTDRUCK").toInt());
+    break;
   }
+
+  filterParameter = index;
 
   showTable();
 }

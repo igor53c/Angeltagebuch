@@ -20,13 +20,13 @@ bool SortFilterProxyModel::filterAcceptsRow(
 bool SortFilterProxyModel::filteringByAngelplatz(
     int source_row, const QModelIndex &source_parent) const {
 
-  if (angelplatz < 1)
+  if (angelplatz.isEmpty())
     return true;
 
   QModelIndex ind =
       sourceModel()->index(source_row, angelplatzColumn, source_parent);
 
-  return sourceModel()->data(ind, Qt::DisplayRole).toLongLong() == angelplatz;
+  return sourceModel()->data(ind, Qt::DisplayRole).toString() == angelplatz;
 }
 
 bool SortFilterProxyModel::filteringByName(
@@ -67,13 +67,13 @@ bool SortFilterProxyModel::filteringByNacht(
 bool SortFilterProxyModel::filteringByParameter(
     int source_row, const QModelIndex &source_parent) const {
 
-  if (parameter.isEmpty())
+  if (parameter == 0)
     return true;
 
   QModelIndex ind =
       sourceModel()->index(source_row, parameterColumn, source_parent);
 
-  return parameter == "Zeit"
+  return parameter == 3
              ? sourceModel()->data(ind, Qt::DisplayRole).toDateTime() >=
                        zeitMin &&
                    sourceModel()->data(ind, Qt::DisplayRole).toDateTime() <=
@@ -84,54 +84,56 @@ bool SortFilterProxyModel::filteringByParameter(
                        parameterMax;
 }
 
-void SortFilterProxyModel::setAngelplatz(qint64 angelplatz) {
+void SortFilterProxyModel::setAngelplatz(const QString &angelplatz) {
   this->angelplatz = angelplatz;
 }
 
-void SortFilterProxyModel::setAngelplatzColumn(int angelplatzColumn) {
+void SortFilterProxyModel::setAngelplatzColumn(const int angelplatzColumn) {
   this->angelplatzColumn = angelplatzColumn;
 }
 
-void SortFilterProxyModel::setName(QString &name) { this->name = name; }
+void SortFilterProxyModel::setName(const QString &name) { this->name = name; }
 
-void SortFilterProxyModel::setNameColumn(int nameColumn) {
+void SortFilterProxyModel::setNameColumn(const int nameColumn) {
   this->nameColumn = nameColumn;
 }
 
-void SortFilterProxyModel::setNiederschlag(QString &niederschlag) {
+void SortFilterProxyModel::setNiederschlag(const QString &niederschlag) {
   this->niederschlag = niederschlag;
 }
 
-void SortFilterProxyModel::setNiederschlagColumn(int niederschlagColumn) {
+void SortFilterProxyModel::setNiederschlagColumn(const int niederschlagColumn) {
   this->niederschlagColumn = niederschlagColumn;
 }
 
-void SortFilterProxyModel::setNacht(QString &nacht) { this->nacht = nacht; }
+void SortFilterProxyModel::setNacht(const QString &nacht) {
+  this->nacht = nacht;
+}
 
 void SortFilterProxyModel::setNachtColumn(int nachtColumn) {
   this->nachtColumn = nachtColumn;
 }
 
-void SortFilterProxyModel::setParameter(QString &parameter) {
+void SortFilterProxyModel::setParameter(const int parameter) {
   this->parameter = parameter;
 }
 
-void SortFilterProxyModel::setParameterMin(int parameterMin) {
+void SortFilterProxyModel::setParameterMin(const int parameterMin) {
   this->parameterMin = parameterMin;
 }
 
-void SortFilterProxyModel::setParameterMax(int parameterMax) {
+void SortFilterProxyModel::setParameterMax(const int parameterMax) {
   this->parameterMax = parameterMax;
 }
 
-void SortFilterProxyModel::setParameterColumn(int parameterColumn) {
+void SortFilterProxyModel::setParameterColumn(const int parameterColumn) {
   this->parameterColumn = parameterColumn;
 }
 
-void SortFilterProxyModel::setZeitMin(QDateTime zeitMin) {
+void SortFilterProxyModel::setZeitMin(const QDateTime &zeitMin) {
   this->zeitMin = zeitMin;
 }
 
-void SortFilterProxyModel::setZeitMax(QDateTime zeitMax) {
+void SortFilterProxyModel::setZeitMax(const QDateTime &zeitMax) {
   this->zeitMax = zeitMax;
 }

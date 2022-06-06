@@ -1,8 +1,8 @@
 #pragma once
 
+#include <QDateTime>
 #include <QObject>
 #include <QSortFilterProxyModel>
-#include <QDateTime>
 
 class SortFilterProxyModel : public QSortFilterProxyModel {
 
@@ -12,23 +12,23 @@ public:
   bool filterAcceptsRow(int source_row,
                         const QModelIndex &source_parent) const override;
 
-  void setAngelplatz(qint64 angelplatz);
-  void setAngelplatzColumn(int angelplatzColumn);
-  void setName(QString& name);
-  void setNameColumn(int nameColumn);
-  void setNiederschlag(QString& niederschlag);
-  void setNiederschlagColumn(int niederschlagColumn);
-  void setNacht(QString& nacht);
-  void setNachtColumn(int nachtColumn);
-  void setParameter(QString& parameter);
-  void setParameterMin(int parameterMin);
-  void setParameterMax(int parameterMax);
-  void setParameterColumn(int parameterColumn);
-  void setZeitMin(QDateTime zeitMin);
-  void setZeitMax(QDateTime zeitMax);
+  void setAngelplatz(const QString &angelplatz);
+  void setAngelplatzColumn(const int angelplatzColumn);
+  void setName(const QString &name);
+  void setNameColumn(const int nameColumn);
+  void setNiederschlag(const QString &niederschlag);
+  void setNiederschlagColumn(const int niederschlagColumn);
+  void setNacht(const QString &nacht);
+  void setNachtColumn(const int nachtColumn);
+  void setParameter(const int parameter);
+  void setParameterMin(const int parameterMin);
+  void setParameterMax(const int parameterMax);
+  void setParameterColumn(const int parameterColumn);
+  void setZeitMin(const QDateTime &zeitMin);
+  void setZeitMax(const QDateTime &zeitMax);
 
 private:
-  qint64 angelplatz;
+  QString angelplatz;
   int angelplatzColumn;
   QString name;
   int nameColumn;
@@ -36,16 +36,19 @@ private:
   int niederschlagColumn;
   QString nacht;
   int nachtColumn;
-  QString parameter;
+  int parameter;
   int parameterMin;
   int parameterMax;
   int parameterColumn;
   QDateTime zeitMin;
   QDateTime zeitMax;
 
-  bool filteringByAngelplatz(int source_row, const QModelIndex &source_parent) const;
+  bool filteringByAngelplatz(int source_row,
+                             const QModelIndex &source_parent) const;
   bool filteringByName(int source_row, const QModelIndex &source_parent) const;
-  bool filteringByNiederschlag(int source_row, const QModelIndex &source_parent) const;
+  bool filteringByNiederschlag(int source_row,
+                               const QModelIndex &source_parent) const;
   bool filteringByNacht(int source_row, const QModelIndex &source_parent) const;
-  bool filteringByParameter(int source_row, const QModelIndex &source_parent) const;
+  bool filteringByParameter(int source_row,
+                            const QModelIndex &source_parent) const;
 };

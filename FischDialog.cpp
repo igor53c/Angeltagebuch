@@ -1,11 +1,11 @@
 #include "FischDialog.h"
 #include "ui_FischDialog.h"
 
-FischDialog::FischDialog(qint64 angelplatzKey, qint64 key, QWidget *parent)
+FischDialog::FischDialog(QString &angelplatzName, qint64 key, QWidget *parent)
     : QDialog(parent), ui(new Ui::FischDialog) {
   ui->setupUi(this);
 
-  this->angelplatzKey = angelplatzKey;
+  this->angelplatzName = angelplatzName;
 
   dlgKey = key;
 
@@ -16,10 +16,12 @@ FischDialog::~FischDialog() { delete ui; }
 
 void FischDialog::init() {
 
+    niederschlagList = QStringList() << tr("Sonnig") << tr("Wolkig")
+                                     << tr("Regen") << tr("Schnee");
+
   ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
 
-  ui->cbNiederschlag->addItems(QStringList() << tr("Sonnig") << tr("Wolkig")
-                                             << tr("Regen") << tr("Schnee"));
+  ui->cbNiederschlag->addItems(niederschlagList);
 
   ui->cbFischarten->addItems(QStringList() << tr("Fischarten")
                                            << FischeDAO::readFischarten());
@@ -57,7 +59,7 @@ void FischDialog::readEntry(qint64 key) {
                                      Qt::SmoothTransformation));
   }
 
-  angelplatzKey = fisch->getAngelplatz();
+  angelplatzName = fisch->getAngelplatz();
 
   ui->cbFischarten->setCurrentText(fisch->getName());
   ui->sbLaenge->setValue(fisch->getLaenge());
@@ -66,8 +68,8 @@ void FischDialog::readEntry(qint64 key) {
   ui->sbTemperatur->setValue(fisch->getTemperatur());
   ui->sbWindgeschwindigkeit->setValue(fisch->getWindgeschwindigkeit());
   ui->sbLuftdruck->setValue(fisch->getLuftdruck());
-  ui->checkNacht->setChecked(fisch->getIsNacht() == tr("Ja"));
-  ui->cbNiederschlag->setCurrentText(fisch->getNiederschlag());
+  ui->checkNacht->setChecked(fisch->getIsNacht());
+  ui->cbNiederschlag->setCurrentText(niederschlagList[fisch->getNiederschlag()]);
   ui->textInfo->setText(fisch->getInfo());
 
   // Objekt plz vom Heap löschen
@@ -78,17 +80,17 @@ bool FischDialog::saveEntry() {
 
   bool retValue = false;
 
-  if (!QString::compare(ui->cbFischarten->currentText(), tr("Fischarten")) &&
+  if (ui->cbFischarten->currentIndex() == 0 &&
       ui->textFischarten->text().isEmpty()) {
+
     QMessageBox::critical(this, this->windowTitle(), tr("Eingabe fehlt"));
     ui->textFischarten->setFocus();
     return retValue;
   }
 
-  QString name =
-      !QString::compare(ui->cbFischarten->currentText(), tr("Fischarten"))
-          ? ui->textFischarten->text()
-          : ui->cbFischarten->currentText();
+  QString name = ui->cbFischarten->currentIndex() == 0
+                     ? ui->textFischarten->text()
+                     : ui->cbFischarten->currentText();
 
   auto fun = [&](bool value, EditMode mode) {
     retValue = value;
@@ -145,22 +147,22 @@ bool FischDialog::updateEntry(QString &name, qint64 key) {
   delete fisch;
 
   return FischeDAO::updateFisch(
-      key, imagePath, name, angelplatzKey, ui->sbLaenge->value(),
+      key, imagePath, name, angelplatzName, ui->sbLaenge->value(),
       ui->sbGewicht->value(), ui->dateTimeEdit->dateTime(),
       ui->sbTemperatur->value(), ui->sbWindgeschwindigkeit->value(),
       ui->sbLuftdruck->value(),
-      ui->checkNacht->isChecked() ? tr("Ja") : tr("Nein"),
-      ui->cbNiederschlag->currentText(), ui->textInfo->toPlainText());
+      ui->checkNacht->isChecked(),
+      ui->cbNiederschlag->currentIndex(), ui->textInfo->toPlainText());
 }
 
 bool FischDialog::insertEntry(QString &name) {
   return FischeDAO::insertFisch(
-      imagePath, name, angelplatzKey, ui->sbLaenge->value(),
+      imagePath, name, angelplatzName, ui->sbLaenge->value(),
       ui->sbGewicht->value(), ui->dateTimeEdit->dateTime(),
       ui->sbTemperatur->value(), ui->sbWindgeschwindigkeit->value(),
       ui->sbLuftdruck->value(),
-      ui->checkNacht->isChecked() ? tr("Ja") : tr("Nein"),
-      ui->cbNiederschlag->currentText(), ui->textInfo->toPlainText());
+      ui->checkNacht->isChecked(),
+      ui->cbNiederschlag->currentIndex(), ui->textInfo->toPlainText());
 }
 
 void FischDialog::importImage() {
@@ -203,13 +205,12 @@ void FischDialog::on_btnSpeichern_clicked() {
   close();
 }
 
-void FischDialog::on_cbFischarten_currentTextChanged(const QString &text) {
-
+void FischDialog::on_cbFischarten_currentIndexChanged(int index) {
   isModified = true;
 
-  ui->textFischarten->setVisible(!QString::compare(text, tr("Fischarten")));
+  ui->textFischarten->setVisible(index == 0);
 
-  ui->lblFischartenSpace->setVisible(QString::compare(text, tr("Fischarten")));
+  ui->lblFischartenSpace->setVisible(index != 0);
 }
 
 void FischDialog::on_textFischarten_textChanged(const QString &) {

@@ -206,7 +206,10 @@ void MainWindow::showAngelplatzDialog(const qint64 key) {
 void MainWindow::showAngelplatzWindow(const qint64 key) {
   delete angelplatzWindow;
 
-  angelplatzWindow = new AngelplatzWindow(columnAngelplatzWidth, key, this);
+  QString angelplatzName = AngelplaetzeDAO::readAngelplatzName(key);
+
+  angelplatzWindow =
+      new AngelplatzWindow(columnAngelplatzWidth, angelplatzName, this);
 
   connect(angelplatzWindow, &AngelplatzWindow::dataModified, this,
           &MainWindow::refreshTableView);
@@ -223,20 +226,22 @@ void MainWindow::deleteEntry(const QModelIndex &index) {
   // Parameter übergebenen QModelIndex.
   qint64 key = model->record(index.row()).value("PRIMARYKEY").toLongLong();
 
+  QString angelPlatzName = AngelplaetzeDAO::readAngelplatzName(key);
+
   int msgValue = QMessageBox::question(
       this, this->windowTitle(),
       tr("Angelplatz löschen: ") +
           model->record(index.row()).value("NAME").toString() +
           tr("\nAnzahl der zu löschenden Fische: ") +
-          QString::number(FischeDAO::countFischeInAngelplatz(key)),
+          QString::number(FischeDAO::countFischeInAngelplatz(angelPlatzName)),
       QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
 
   if (msgValue == QMessageBox::Cancel)
     return;
 
   // Löschen der Postleitzahl über den Primärschlüssel
-  if ((FischeDAO::countFischeInAngelplatz(key) > 0
-           ? FischeDAO::deleteFischeInAngelplatz(key)
+  if ((FischeDAO::countFischeInAngelplatz(angelPlatzName) > 0
+           ? FischeDAO::deleteFischeInAngelplatz(angelPlatzName)
            : true) &&
       AngelplaetzeDAO::deleteAngelplatz(key)) {
 
@@ -355,6 +360,7 @@ void MainWindow::modifyTableView(const qint64 key,
 }
 
 void MainWindow::setColumnAngelplatzWidth(const QList<int> list) {
+
   columnAngelplatzWidth = list;
 }
 
@@ -387,7 +393,7 @@ void MainWindow::loadLanguage(const QString &language) {
   if (language.toLower() == "en" && enTranslator != nullptr) {
     // Englische Systemtexte laden
     sysLoaded = sysTranslator->load(
-        "qt_" + language, QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+        "qtbase_" + language, QLibraryInfo::path(QLibraryInfo::TranslationsPath));
 
     // Übersetzer für Englisch installieren
     enTranslatorInstalled = QApplication::installTranslator(enTranslator);
@@ -398,7 +404,7 @@ void MainWindow::loadLanguage(const QString &language) {
 
     // Deutsche Systemtexte laden
     sysLoaded = sysTranslator->load(
-        "qt_de", QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+        "qtbase_de", QLibraryInfo::path(QLibraryInfo::TranslationsPath));
     ui->actionDeutsch->setChecked(true);
     currentLanguage = "";
   }
@@ -607,7 +613,7 @@ void MainWindow::on_actionMarkierterAngelplatz_triggered() {
 }
 
 void MainWindow::on_actionAlleAngelpltze_triggered() {
-  showAngelplatzWindow(-1);
+  showAngelplatzWindow(0);
 }
 
 void MainWindow::on_actionDeutsch_triggered() {

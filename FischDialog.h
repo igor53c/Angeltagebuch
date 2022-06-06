@@ -18,7 +18,7 @@ class FischDialog : public QDialog {
   Q_OBJECT
 
 public:
-  explicit FischDialog(qint64 angelplatzKey, qint64 key,
+  explicit FischDialog(QString &angelplatzName, qint64 key,
                        QWidget *parent = nullptr);
   ~FischDialog();
 
@@ -31,7 +31,7 @@ private slots:
   void on_btnAbbrechen_clicked();
   void on_btnBildHochladen_clicked();
   void on_btnSpeichern_clicked();
-  void on_cbFischarten_currentTextChanged(const QString &text);
+  void on_cbFischarten_currentIndexChanged(int index);
   void on_textFischarten_textChanged(const QString &);
   void on_sbLaenge_valueChanged(int);
   void on_sbGewicht_valueChanged(int);
@@ -43,12 +43,13 @@ private slots:
   void on_cbNiederschlag_currentTextChanged(const QString &);
   void on_textInfo_textChanged();
 
-private:
+  private:
   Ui::FischDialog *ui;
-  qint64 angelplatzKey;
+  QString angelplatzName;
   qint64 dlgKey;
   QString imagePath;
   bool isModified;
+  QStringList niederschlagList;
 
   void init();
   void readEntry(qint64 key);

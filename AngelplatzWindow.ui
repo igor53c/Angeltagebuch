@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>AngelplatzWindow</class>
  <widget class="QMainWindow" name="AngelplatzWindow">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -185,7 +188,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Min:</string>
+           <string>Min</string>
           </property>
          </widget>
         </item>
@@ -246,7 +249,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Max:</string>
+           <string>Max</string>
           </property>
          </widget>
         </item>
