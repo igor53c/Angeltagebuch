@@ -3,6 +3,7 @@
 
 AngelplatzDialog::AngelplatzDialog(qint64 key, QWidget *parent)
     : QDialog(parent), ui(new Ui::AngelplatzDialog) {
+
   ui->setupUi(this);
 
   dlgKey = key;
@@ -19,10 +20,17 @@ void AngelplatzDialog::init() {
   if (dlgKey > 0)
     readEntry(dlgKey);
 
-  isModified = false;
+  setIsModified(false);
+
+  ui->textName->setFocus();
 }
 
-void AngelplatzDialog::readEntry(qint64 key) {
+void AngelplatzDialog::setIsModified(const bool isModified) {
+  this->isModified = isModified;
+  ui->btnSpeichern->setEnabled(isModified);
+}
+
+void AngelplatzDialog::readEntry(const qint64 key) {
 
   Angelplatz *angelplatz = AngelplaetzeDAO::readAngelplatz(key);
 
@@ -125,7 +133,7 @@ bool AngelplatzDialog::entryIsValid() {
   return retValue;
 }
 
-bool AngelplatzDialog::updateEntry(qint64 key) {
+bool AngelplatzDialog::updateEntry(const qint64 key) {
   // Vor dem UPDATE prüfen, oder der TIMESTAMP des Datensatzes in der
   // Zwischenzeit von einem Benutzer geändert wurde
 
@@ -174,7 +182,7 @@ void AngelplatzDialog::importImage() {
 
 void AngelplatzDialog::on_btnBildHochladen_clicked() {
 
-  isModified = true;
+  setIsModified(true);
 
   importImage();
 }
@@ -191,30 +199,30 @@ void AngelplatzDialog::on_btnSpeichern_clicked() {
 
 void AngelplatzDialog::on_textName_textChanged(const QString &) {
 
-  isModified = true;
+  setIsModified(true);
 }
 
 void AngelplatzDialog::on_textType_textChanged(const QString &) {
 
-  isModified = true;
+  setIsModified(true);
 }
 
 void AngelplatzDialog::on_textPlz_textChanged(const QString &) {
 
-  isModified = true;
+  setIsModified(true);
 }
 
 void AngelplatzDialog::on_textOrt_textChanged(const QString &) {
 
-  isModified = true;
+  setIsModified(true);
 }
 
 void AngelplatzDialog::on_textLand_textChanged(const QString &) {
 
-  isModified = true;
+  setIsModified(true);
 }
 
-void AngelplatzDialog::on_textInfo_textChanged() { isModified = true; }
+void AngelplatzDialog::on_textInfo_textChanged() { setIsModified(true); }
 
 void AngelplatzDialog::closeEvent(QCloseEvent *event) {
 
@@ -222,3 +230,13 @@ void AngelplatzDialog::closeEvent(QCloseEvent *event) {
 }
 
 void AngelplatzDialog::reject() { close(); }
+
+void AngelplatzDialog::on_textName_returnPressed() { this->focusNextChild(); }
+
+void AngelplatzDialog::on_textType_returnPressed() { this->focusNextChild(); }
+
+void AngelplatzDialog::on_textPlz_returnPressed() { this->focusNextChild(); }
+
+void AngelplatzDialog::on_textOrt_returnPressed() { this->focusNextChild(); }
+
+void AngelplatzDialog::on_textLand_returnPressed() { this->focusNextChild(); }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>600</height>
+    <height>620</height>
    </rect>
   </property>
   <property name="font">
@@ -39,7 +39,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="AngelnTagebuch.qrc">:/imageIcon.png</pixmap>
+        <pixmap resource="Angeltagebuch.qrc">:/imageIcon.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -67,6 +67,9 @@
          </property>
          <property name="text">
           <string>&amp;Bildhochladen</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -104,6 +107,9 @@
          <property name="text">
           <string>&amp;Speichern</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -122,6 +128,9 @@
          </property>
          <property name="text">
           <string>&amp;Abbrechen</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -801,9 +810,8 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>btnBildHochladen</tabstop>
-  <tabstop>cbFischarten</tabstop>
   <tabstop>textFischarten</tabstop>
+  <tabstop>cbFischarten</tabstop>
   <tabstop>sbLaenge</tabstop>
   <tabstop>sbGewicht</tabstop>
   <tabstop>dateTimeEdit</tabstop>
@@ -813,11 +821,12 @@
   <tabstop>checkNacht</tabstop>
   <tabstop>cbNiederschlag</tabstop>
   <tabstop>textInfo</tabstop>
+  <tabstop>btnBildHochladen</tabstop>
   <tabstop>btnSpeichern</tabstop>
   <tabstop>btnAbbrechen</tabstop>
  </tabstops>
  <resources>
-  <include location="AngelnTagebuch.qrc"/>
+  <include location="Angeltagebuch.qrc"/>
  </resources>
  <connections/>
 </ui>

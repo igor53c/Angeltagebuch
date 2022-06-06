@@ -10,9 +10,9 @@
 #include "AngelplatzDialog.h"
 #include "FischDialog.h"
 #include "FischeDAO.h"
+#include "FischeSqlTableModel.h"
 #include "ImageStyleItemDelegate.h"
 #include "SortFilterProxyModel.h"
-#include "FischeSqlTableModel.h"
 
 namespace Ui {
 class AngelplatzWindow;
@@ -48,7 +48,7 @@ private slots:
   void tableView_section_resized(int index, int oldSize, int newSize);
   void tableView_selectionChanged();
 
-  private:
+private:
   Ui::AngelplatzWindow *ui;
   QString angelplatzName;
   QLabel *statusLabel;
@@ -72,7 +72,8 @@ private slots:
   void findItemInTableView(const QString &columnName, const QVariant &value);
   // Aktualisiert die TableView nach einer Datensatzänderung
   void updateTableView(const qint64 key);
-  void showParameterFilter(bool spinBox, bool dateTime, bool text);
+  void showParameterFilter(const bool spinBox, const bool dateTime,
+                           const bool text);
   // Event filter für die TableView
   bool eventFilter(QObject *sender, QEvent *event) override;
   // Überschriebene Methoden

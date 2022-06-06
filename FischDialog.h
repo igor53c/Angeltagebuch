@@ -42,8 +42,9 @@ private slots:
   void on_checkNacht_stateChanged(int);
   void on_cbNiederschlag_currentTextChanged(const QString &);
   void on_textInfo_textChanged();
+  void on_textFischarten_returnPressed();
 
-  private:
+private:
   Ui::FischDialog *ui;
   QString angelplatzName;
   qint64 dlgKey;
@@ -52,11 +53,12 @@ private slots:
   QStringList niederschlagList;
 
   void init();
-  void readEntry(qint64 key);
+  void setIsModified(const bool isModified);
+  void readEntry(const qint64 key);
   bool saveEntry();
   bool querySave();
-  bool updateEntry(QString &name, qint64 key);
-  bool insertEntry(QString &name);
+  bool updateEntry(const QString &name, const qint64 key);
+  bool insertEntry(const QString &name);
   void importImage();
   void closeEvent(QCloseEvent *event) override;
   void reject() override;

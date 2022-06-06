@@ -87,263 +87,257 @@ Do you want to save the changes?</translation>
 <context>
     <name>AngelplatzWindow</name>
     <message>
-        <location filename="AngelplatzWindow.ui" line="19"/>
+        <location filename="AngelplatzWindow.ui" line="22"/>
         <source>Fische</source>
         <translation type="unfinished">Fish</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="65"/>
+        <location filename="AngelplatzWindow.ui" line="68"/>
         <source>Alle Angelplätze</source>
         <translation type="unfinished">All fishing spots</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="103"/>
+        <location filename="AngelplatzWindow.ui" line="106"/>
         <source>Filter:</source>
         <translation type="unfinished">Filter:</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="188"/>
         <source>Min:</source>
-        <translation type="unfinished">Min:</translation>
+        <translation type="obsolete">Min:</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="249"/>
         <source>Max:</source>
-        <translation type="unfinished">Max:</translation>
+        <translation type="obsolete">Max:</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="366"/>
+        <location filename="AngelplatzWindow.ui" line="191"/>
+        <source>Min</source>
+        <translation type="unfinished">Min</translation>
+    </message>
+    <message>
+        <location filename="AngelplatzWindow.ui" line="252"/>
+        <source>Max</source>
+        <translation type="unfinished">Max</translation>
+    </message>
+    <message>
+        <location filename="AngelplatzWindow.ui" line="369"/>
         <source>&amp;Datei</source>
         <translation type="unfinished">&amp;File</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="372"/>
+        <location filename="AngelplatzWindow.ui" line="375"/>
         <source>&amp;Bearbeiten</source>
         <translation type="unfinished">&amp;Edit</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="396"/>
+        <location filename="AngelplatzWindow.ui" line="399"/>
         <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="414"/>
+        <location filename="AngelplatzWindow.ui" line="417"/>
         <source>&amp;Neu...</source>
         <translation type="unfinished">&amp;New...</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="417"/>
+        <location filename="AngelplatzWindow.ui" line="420"/>
         <source>Ctrl+N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="426"/>
+        <location filename="AngelplatzWindow.ui" line="429"/>
         <source>Ä&amp;ndern...</source>
         <oldsource>&amp;Ändern...</oldsource>
         <translation type="unfinished">M&amp;odify...</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="429"/>
+        <location filename="AngelplatzWindow.ui" line="432"/>
         <source>Ctrl+E</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="438"/>
+        <location filename="AngelplatzWindow.ui" line="441"/>
         <source>&amp;Löschen</source>
         <translation type="unfinished">&amp;Delete</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="441"/>
+        <location filename="AngelplatzWindow.ui" line="444"/>
         <source>Ctrl+D</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="450"/>
+        <location filename="AngelplatzWindow.ui" line="453"/>
         <source>B&amp;eenden</source>
         <translation type="unfinished">E&amp;xit</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.ui" line="453"/>
+        <location filename="AngelplatzWindow.ui" line="456"/>
         <source>Ctrl+Q</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="52"/>
-        <location filename="AngelplatzWindow.cpp" line="99"/>
-        <location filename="AngelplatzWindow.cpp" line="516"/>
+        <location filename="AngelplatzWindow.cpp" line="57"/>
+        <location filename="AngelplatzWindow.cpp" line="103"/>
+        <location filename="AngelplatzWindow.cpp" line="505"/>
         <source>Niederschlag</source>
         <translation type="unfinished">Weather</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="52"/>
+        <location filename="AngelplatzWindow.cpp" line="48"/>
         <source>Sonnig</source>
         <translation type="unfinished">Sunny</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="53"/>
+        <location filename="AngelplatzWindow.cpp" line="48"/>
         <source>Wolkig</source>
         <translation type="unfinished">Cloudy</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="53"/>
+        <location filename="AngelplatzWindow.cpp" line="49"/>
         <source>Regen</source>
         <translation type="unfinished">Rain</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="53"/>
+        <location filename="AngelplatzWindow.cpp" line="49"/>
         <source>Schnee</source>
         <translation type="unfinished">Snow</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="55"/>
-        <location filename="AngelplatzWindow.cpp" line="97"/>
-        <location filename="AngelplatzWindow.cpp" line="523"/>
+        <location filename="AngelplatzWindow.cpp" line="59"/>
+        <location filename="AngelplatzWindow.cpp" line="101"/>
+        <location filename="AngelplatzWindow.cpp" line="512"/>
         <source>Nacht</source>
         <translation type="unfinished">Night</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="55"/>
+        <location filename="AngelplatzWindow.cpp" line="46"/>
         <source>Ja</source>
         <translation type="unfinished">Yes</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="55"/>
+        <location filename="AngelplatzWindow.cpp" line="46"/>
         <source>Nein</source>
         <translation type="unfinished">No</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="58"/>
-        <location filename="AngelplatzWindow.cpp" line="530"/>
+        <location filename="AngelplatzWindow.cpp" line="62"/>
         <source>Parameter</source>
         <translation type="unfinished">Parameter</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="58"/>
-        <location filename="AngelplatzWindow.cpp" line="133"/>
-        <location filename="AngelplatzWindow.cpp" line="544"/>
+        <location filename="AngelplatzWindow.cpp" line="62"/>
         <source>Länge</source>
         <translation type="unfinished">Length</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="58"/>
-        <location filename="AngelplatzWindow.cpp" line="137"/>
-        <location filename="AngelplatzWindow.cpp" line="549"/>
+        <location filename="AngelplatzWindow.cpp" line="62"/>
         <source>Gewicht</source>
         <translation type="unfinished">Weight</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="59"/>
-        <location filename="AngelplatzWindow.cpp" line="141"/>
-        <location filename="AngelplatzWindow.cpp" line="554"/>
-        <location filename="AngelplatzWindow.cpp" line="580"/>
+        <location filename="AngelplatzWindow.cpp" line="63"/>
         <source>Zeit</source>
         <translation type="unfinished">Time</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="59"/>
-        <location filename="AngelplatzWindow.cpp" line="145"/>
-        <location filename="AngelplatzWindow.cpp" line="564"/>
+        <location filename="AngelplatzWindow.cpp" line="63"/>
         <source>Temperatur</source>
         <translation type="unfinished">Temperature</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="60"/>
-        <location filename="AngelplatzWindow.cpp" line="149"/>
-        <location filename="AngelplatzWindow.cpp" line="569"/>
+        <location filename="AngelplatzWindow.cpp" line="64"/>
         <source>Windgeschwindigkeit</source>
         <translation type="unfinished">Wind speed</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="60"/>
-        <location filename="AngelplatzWindow.cpp" line="154"/>
-        <location filename="AngelplatzWindow.cpp" line="574"/>
+        <location filename="AngelplatzWindow.cpp" line="64"/>
         <source>Luftdruck</source>
         <translation type="unfinished">Air pressure</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="81"/>
+        <location filename="AngelplatzWindow.cpp" line="85"/>
         <source>Name</source>
         <translation type="unfinished">Name</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="83"/>
+        <location filename="AngelplatzWindow.cpp" line="87"/>
         <source>Angelplatz</source>
         <translation type="unfinished">Fishing spot</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="85"/>
+        <location filename="AngelplatzWindow.cpp" line="89"/>
         <source>Länge
 [ cm ]</source>
         <translation type="unfinished">Length
 [ cm ]</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="87"/>
+        <location filename="AngelplatzWindow.cpp" line="91"/>
         <source>Gewicht
 [ g ]</source>
         <translation type="unfinished">Weight
 [ g ]</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="89"/>
+        <location filename="AngelplatzWindow.cpp" line="93"/>
         <source>Zeit
 dd/MM/yyyy HH:mm</source>
         <translation type="unfinished">Time
 dd/MM/yyyy HH:mm</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="91"/>
+        <location filename="AngelplatzWindow.cpp" line="95"/>
         <source>Temperatur
 [ °C ]</source>
         <translation type="unfinished">Temperature
 [ °C ]</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="93"/>
+        <location filename="AngelplatzWindow.cpp" line="97"/>
         <source>Windgeschwindigkeit
 [ km/h ]</source>
         <translation type="unfinished">Wind speed
 [ km/h ]</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="95"/>
+        <location filename="AngelplatzWindow.cpp" line="99"/>
         <source>Luftdruck
 [ hPa ]</source>
         <translation type="unfinished">Air pressure
 [ hPa ]</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="101"/>
+        <location filename="AngelplatzWindow.cpp" line="105"/>
         <source>Zusätzliche Information</source>
         <translation type="unfinished">Additional information</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="222"/>
-        <location filename="AngelplatzWindow.cpp" line="303"/>
+        <location filename="AngelplatzWindow.cpp" line="213"/>
+        <location filename="AngelplatzWindow.cpp" line="285"/>
         <source>Der Datensatz ist leer.</source>
         <translation type="unfinished">The record is empty.</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="267"/>
+        <location filename="AngelplatzWindow.cpp" line="254"/>
         <source>Datensatz löschen:
 </source>
-        <translation type="unfinished">Datensatz löschen:
+        <translation type="unfinished">Delete record:
 </translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="290"/>
-        <location filename="AngelplatzWindow.cpp" line="309"/>
+        <location filename="AngelplatzWindow.cpp" line="272"/>
+        <location filename="AngelplatzWindow.cpp" line="291"/>
         <source>Einträge werden aktualisiert...</source>
         <translation type="unfinished">Entries are being updated...</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="445"/>
+        <location filename="AngelplatzWindow.cpp" line="427"/>
         <source>Datensatz %L1 von %L2</source>
         <translation type="unfinished">Record %L1 out of %L2</translation>
     </message>
     <message>
-        <location filename="AngelplatzWindow.cpp" line="48"/>
-        <location filename="AngelplatzWindow.cpp" line="507"/>
+        <location filename="AngelplatzWindow.cpp" line="53"/>
+        <location filename="AngelplatzWindow.cpp" line="496"/>
         <source>Fischarten</source>
         <translation type="unfinished">Fish types</translation>
     </message>
@@ -451,71 +445,62 @@ dd/MM/yyyy HH:mm</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="21"/>
+        <location filename="FischDialog.cpp" line="19"/>
         <source>Sonnig</source>
         <translation type="unfinished">Sunny</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="21"/>
+        <location filename="FischDialog.cpp" line="19"/>
         <source>Wolkig</source>
         <translation type="unfinished">Cloudy</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="22"/>
+        <location filename="FischDialog.cpp" line="20"/>
         <source>Regen</source>
         <translation type="unfinished">Rain</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="22"/>
+        <location filename="FischDialog.cpp" line="20"/>
         <source>Schnee</source>
         <translation type="unfinished">Snow</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="69"/>
-        <location filename="FischDialog.cpp" line="152"/>
-        <location filename="FischDialog.cpp" line="162"/>
         <source>Ja</source>
-        <translation type="unfinished">Yes</translation>
+        <translation type="obsolete">Yes</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="24"/>
-        <location filename="FischDialog.cpp" line="81"/>
-        <location filename="FischDialog.cpp" line="89"/>
-        <location filename="FischDialog.cpp" line="210"/>
-        <location filename="FischDialog.cpp" line="212"/>
+        <location filename="FischDialog.cpp" line="26"/>
         <source>Fischarten</source>
         <translation type="unfinished">Fish types</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="83"/>
+        <location filename="FischDialog.cpp" line="86"/>
         <source>Eingabe fehlt</source>
         <translation type="unfinished">Entry is missing</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="119"/>
+        <location filename="FischDialog.cpp" line="121"/>
         <source>Daten wurden geändert.
 Sollen die Änderungen gespeichert werden?</source>
         <translation type="unfinished">Data has been changed.
 Do you want to save the changes?</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="152"/>
-        <location filename="FischDialog.cpp" line="162"/>
         <source>Nein</source>
-        <translation type="unfinished">No</translation>
+        <translation type="obsolete">No</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="169"/>
+        <location filename="FischDialog.cpp" line="171"/>
         <source>Alle Bilddateien (*.jpeg *.jpg *.bmp *.png *.jfif)</source>
         <translation type="unfinished">All image files (*.jpeg *.jpg *.bmp *.png *.jfif)</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="173"/>
+        <location filename="FischDialog.cpp" line="175"/>
         <source>Bild hochladen</source>
         <translation type="unfinished">Upload image</translation>
     </message>
     <message>
-        <location filename="FischDialog.cpp" line="174"/>
+        <location filename="FischDialog.cpp" line="176"/>
         <source>Alle Dateien (*.*);;</source>
         <translation type="unfinished">All files(*.*);;</translation>
     </message>
@@ -619,77 +604,77 @@ Do you want to save the changes?</translation>
         <translation type="unfinished">&amp;English</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="115"/>
+        <location filename="MainWindow.cpp" line="119"/>
         <source>Name</source>
         <translation type="unfinished">Name</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="117"/>
+        <location filename="MainWindow.cpp" line="121"/>
         <source>Typ</source>
         <oldsource>Type</oldsource>
         <translation type="unfinished">Type</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="119"/>
+        <location filename="MainWindow.cpp" line="123"/>
         <source>Fische</source>
         <translation type="unfinished">Fish</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="121"/>
+        <location filename="MainWindow.cpp" line="125"/>
         <source>PLZ</source>
         <translation type="unfinished">ZIP Code</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="123"/>
+        <location filename="MainWindow.cpp" line="127"/>
         <source>Ort</source>
         <translation type="unfinished">Location</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="125"/>
+        <location filename="MainWindow.cpp" line="129"/>
         <source>Land</source>
         <translation type="unfinished">Land</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="127"/>
+        <location filename="MainWindow.cpp" line="131"/>
         <source>Zusätzliche Information</source>
         <translation type="unfinished">Additional information</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="185"/>
-        <location filename="MainWindow.cpp" line="247"/>
+        <location filename="MainWindow.cpp" line="192"/>
+        <location filename="MainWindow.cpp" line="262"/>
         <source>Der Datensatz ist leer.</source>
         <translation type="unfinished">The record is empty.</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="218"/>
+        <location filename="MainWindow.cpp" line="233"/>
         <source>Angelplatz löschen: </source>
         <translation type="unfinished">Delete fishing spot: </translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="220"/>
+        <location filename="MainWindow.cpp" line="235"/>
         <source>
 Anzahl der zu löschenden Fische: </source>
         <translation type="unfinished">
 Number of fish to be deleted: </translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="233"/>
-        <location filename="MainWindow.cpp" line="253"/>
+        <location filename="MainWindow.cpp" line="248"/>
+        <location filename="MainWindow.cpp" line="268"/>
         <source>Einträge werden aktualisiert...</source>
         <translation type="unfinished">Entries are being updated...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="353"/>
+        <location filename="MainWindow.cpp" line="373"/>
         <source>Datensatz %L1 von %L2</source>
         <translation type="unfinished">Record %L1 out of %L2</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="464"/>
+        <location filename="MainWindow.cpp" line="488"/>
         <source>Das Verzeichnis &apos;</source>
         <translation type="unfinished">The directory &apos;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="465"/>
+        <location filename="MainWindow.cpp" line="489"/>
         <source>&apos; konnte nicht erstellt werden</source>
         <translation type="unfinished">&apos; could not be created</translation>
     </message>

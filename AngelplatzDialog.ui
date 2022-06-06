@@ -7,13 +7,16 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>600</height>
+    <height>620</height>
    </rect>
   </property>
   <property name="font">
    <font>
     <pointsize>10</pointsize>
    </font>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
   </property>
   <property name="windowTitle">
    <string>Angelplatz</string>
@@ -74,8 +77,14 @@
            <height>30</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="text">
           <string>Bild hochladen</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -113,8 +122,14 @@
            <height>30</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="text">
           <string>&amp;Speichern</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -132,8 +147,14 @@
            <height>30</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="text">
           <string>&amp;Abbrechen</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -197,6 +218,9 @@
          <width>16777215</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="maxLength">
         <number>50</number>
@@ -274,6 +298,9 @@
          <height>30</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="maxLength">
         <number>100</number>
        </property>
@@ -293,6 +320,9 @@
          <height>30</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="maxLength">
         <number>50</number>
        </property>
@@ -311,6 +341,9 @@
          <width>16777215</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="maxLength">
         <number>50</number>
@@ -369,6 +402,9 @@
          <height>30</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="maxLength">
         <number>10</number>
        </property>
@@ -382,6 +418,9 @@
          <height>30</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
       </widget>
      </item>
     </layout>
@@ -389,13 +428,13 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>btnBildHochladen</tabstop>
   <tabstop>textName</tabstop>
   <tabstop>textType</tabstop>
   <tabstop>textPlz</tabstop>
   <tabstop>textOrt</tabstop>
   <tabstop>textLand</tabstop>
   <tabstop>textInfo</tabstop>
+  <tabstop>btnBildHochladen</tabstop>
   <tabstop>btnSpeichern</tabstop>
   <tabstop>btnAbbrechen</tabstop>
  </tabstops>

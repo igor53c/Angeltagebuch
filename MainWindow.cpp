@@ -3,6 +3,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
+
   ui->setupUi(this);
 
   init();
@@ -204,6 +205,7 @@ void MainWindow::showAngelplatzDialog(const qint64 key) {
 }
 
 void MainWindow::showAngelplatzWindow(const qint64 key) {
+
   delete angelplatzWindow;
 
   QString angelplatzName = AngelplaetzeDAO::readAngelplatzName(key);
@@ -226,22 +228,22 @@ void MainWindow::deleteEntry(const QModelIndex &index) {
   // Parameter übergebenen QModelIndex.
   qint64 key = model->record(index.row()).value("PRIMARYKEY").toLongLong();
 
-  QString angelPlatzName = AngelplaetzeDAO::readAngelplatzName(key);
+  QString angelplatzName = AngelplaetzeDAO::readAngelplatzName(key);
 
   int msgValue = QMessageBox::question(
       this, this->windowTitle(),
       tr("Angelplatz löschen: ") +
           model->record(index.row()).value("NAME").toString() +
           tr("\nAnzahl der zu löschenden Fische: ") +
-          QString::number(FischeDAO::countFischeInAngelplatz(angelPlatzName)),
+          QString::number(FischeDAO::countFischeInAngelplatz(angelplatzName)),
       QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
 
   if (msgValue == QMessageBox::Cancel)
     return;
 
   // Löschen der Postleitzahl über den Primärschlüssel
-  if ((FischeDAO::countFischeInAngelplatz(angelPlatzName) > 0
-           ? FischeDAO::deleteFischeInAngelplatz(angelPlatzName)
+  if ((FischeDAO::countFischeInAngelplatz(angelplatzName) > 0
+           ? FischeDAO::deleteFischeInAngelplatz(angelplatzName)
            : true) &&
       AngelplaetzeDAO::deleteAngelplatz(key)) {
 
@@ -366,13 +368,10 @@ void MainWindow::setColumnAngelplatzWidth(const QList<int> list) {
 
 void MainWindow::tableView_selectionChanged() {
 
-  int currentRow = ui->tableView->selectionModel()->currentIndex().row() + 1;
-  int rowCount = ui->tableView->model()->rowCount();
-
-  QString msg =
-      QString(tr("Datensatz %L1 von %L2")).arg(currentRow).arg(rowCount);
-
-  statusLabel->setText(msg);
+  statusLabel->setText(
+      QString(tr("Datensatz %L1 von %L2"))
+          .arg(ui->tableView->selectionModel()->currentIndex().row() + 1)
+          .arg(ui->tableView->model()->rowCount()));
 }
 
 void MainWindow::tableView_section_resized(int index, int, int newSize) {
@@ -392,8 +391,9 @@ void MainWindow::loadLanguage(const QString &language) {
 
   if (language.toLower() == "en" && enTranslator != nullptr) {
     // Englische Systemtexte laden
-    sysLoaded = sysTranslator->load(
-        "qtbase_" + language, QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+    sysLoaded =
+        sysTranslator->load("qtbase_" + language,
+                            QLibraryInfo::path(QLibraryInfo::TranslationsPath));
 
     // Übersetzer für Englisch installieren
     enTranslatorInstalled = QApplication::installTranslator(enTranslator);
@@ -406,7 +406,7 @@ void MainWindow::loadLanguage(const QString &language) {
     sysLoaded = sysTranslator->load(
         "qtbase_de", QLibraryInfo::path(QLibraryInfo::TranslationsPath));
     ui->actionDeutsch->setChecked(true);
-    currentLanguage = "";
+    currentLanguage = QString();
   }
 
   if (sysLoaded)
@@ -414,6 +414,7 @@ void MainWindow::loadLanguage(const QString &language) {
 }
 
 void MainWindow::removeAllTranslators() {
+
   if (enTranslatorInstalled) {
     QApplication::removeTranslator(enTranslator);
     enTranslatorInstalled = false;
@@ -428,6 +429,7 @@ void MainWindow::removeAllTranslators() {
 }
 
 void MainWindow::readXMLSettings(const QString &filename) {
+
   QString language;
 
   // Datei öffnen

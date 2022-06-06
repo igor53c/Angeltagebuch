@@ -4,6 +4,7 @@
 AngelplatzWindow::AngelplatzWindow(QList<int> columnAngelplatzWidth,
                                    QString &angelplatzName, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::AngelplatzWindow) {
+
   ui->setupUi(this);
 
   this->angelplatzName = angelplatzName;
@@ -258,16 +259,16 @@ void AngelplatzWindow::deleteEntry(const QModelIndex &index) {
   if (msgValue == QMessageBox::Cancel)
     return;
 
-  QString angelplatzKey = angelplatzName;
+  QString newAngelplatzName = angelplatzName;
 
   if (angelplatzName.isEmpty())
-    angelplatzKey = FischeDAO::readFischAngelplatz(key);
+    newAngelplatzName = FischeDAO::readFischAngelplatz(key);
 
   // Löschen der Postleitzahl über den Primärschlüssel
   if (FischeDAO::deleteFisch(key) &&
-      AngelplaetzeDAO::changeNumberFische(angelplatzKey, -1)) {
+      AngelplaetzeDAO::changeNumberFische(newAngelplatzName, -1)) {
 
-    emit dataModified(AngelplaetzeDAO::readAngelplatzKey(angelplatzKey));
+    emit dataModified(AngelplaetzeDAO::readAngelplatzKey(newAngelplatzName));
 
     statusLabel->setText(tr("Einträge werden aktualisiert..."));
     QApplication::processEvents();
@@ -296,7 +297,8 @@ void AngelplatzWindow::refreshTableView(const qint64 key) {
   emit dataModified(AngelplaetzeDAO::readAngelplatzKey(angelplatzName));
 
   ui->cbFischarten->clear();
-  ui->cbFischarten->addItems(FischeDAO::readFischarten());
+  ui->cbFischarten->addItems(QStringList() << tr("Fischarten")
+                                           << FischeDAO::readFischarten());
 
   // Postleitzahlen neu in das Datenmodell einlesen
   showTable();
@@ -334,8 +336,7 @@ void AngelplatzWindow::findItemInTableView(const QString &columnName,
   do {
     // Der Suchbegriff kann irgendwo innerhalb der Spalte enthalten sein.
     // Groß-/Kleinschreibung wird nicht berücksichtigt.
-    if (query.value(colIndex).toString().contains(value.toString(),
-                                                  Qt::CaseInsensitive)) {
+    if (query.value(colIndex).toLongLong() == value.toLongLong()) {
       found = true;
       break;
     }
@@ -386,8 +387,9 @@ void AngelplatzWindow::updateTableView(const qint64 key) {
   delete fisch;
 }
 
-void AngelplatzWindow::showParameterFilter(bool spinBox, bool dateTime,
-                                           bool text) {
+void AngelplatzWindow::showParameterFilter(const bool spinBox,
+                                           const bool dateTime,
+                                           const bool text) {
   ui->sbMin->setVisible(spinBox);
   ui->sbMax->setVisible(spinBox);
   ui->dateTimeMin->setVisible(dateTime);
@@ -420,13 +422,10 @@ void AngelplatzWindow::tableView_section_resized(int index, int, int newSize) {
 
 void AngelplatzWindow::tableView_selectionChanged() {
 
-  int currentRow = ui->tableView->selectionModel()->currentIndex().row() + 1;
-  int rowCount = ui->tableView->model()->rowCount();
-
-  QString msg =
-      QString(tr("Datensatz %L1 von %L2")).arg(currentRow).arg(rowCount);
-
-  statusLabel->setText(msg);
+  statusLabel->setText(
+      QString(tr("Datensatz %L1 von %L2"))
+          .arg(ui->tableView->selectionModel()->currentIndex().row() + 1)
+          .arg(ui->tableView->model()->rowCount()));
 }
 
 bool AngelplatzWindow::eventFilter(QObject *sender, QEvent *event) {
