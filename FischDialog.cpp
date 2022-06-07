@@ -97,15 +97,15 @@ bool FischDialog::saveEntry() {
                      ? ui->textFischarten->text()
                      : ui->cbFischarten->currentText();
 
-  auto fun = [&](bool value, EditMode mode) {
+  auto fun = [&](bool value, Cnt::EditMode mode) {
     retValue = value;
 
     if (retValue)
       emit dataModified(dlgKey, mode);
   };
 
-  dlgKey > 0 ? fun(updateEntry(name, dlgKey), EditMode::UPDATE)
-             : fun(insertEntry(name), EditMode::NEW);
+  dlgKey > 0 ? fun(updateEntry(name, dlgKey), Cnt::EditMode::UPDATE)
+             : fun(insertEntry(name), Cnt::EditMode::NEW);
 
   // Modified Flag
   isModified = !retValue;
@@ -141,15 +141,9 @@ bool FischDialog::querySave() {
 }
 
 bool FischDialog::updateEntry(const QString &name, const qint64 key) {
-  // Vor dem UPDATE prüfen, oder der TIMESTAMP des Datensatzes in der
-  // Zwischenzeit von einem Benutzer geändert wurde
 
-  Fisch *fisch = FischeDAO::readFisch(key);
-
-  if (fisch == nullptr)
+  if (!FischeDAO::fischExists(key))
     return false;
-
-  delete fisch;
 
   return FischeDAO::updateFisch(
       key, imagePath, name, angelplatzName, ui->sbLaenge->value(),

@@ -23,10 +23,10 @@ bool SortFilterProxyModel::filteringByAngelplatz(
   if (angelplatz.isEmpty())
     return true;
 
-  QModelIndex ind =
-      sourceModel()->index(source_row, angelplatzColumn, source_parent);
-
-  return sourceModel()->data(ind, Qt::DisplayRole).toString() == angelplatz;
+  return sourceModel()
+             ->data(sourceModel()->index(source_row, angelplatzColumn,
+                                         source_parent))
+             .toString() == angelplatz;
 }
 
 bool SortFilterProxyModel::filteringByName(
@@ -35,9 +35,9 @@ bool SortFilterProxyModel::filteringByName(
   if (name.isEmpty())
     return true;
 
-  QModelIndex ind = sourceModel()->index(source_row, nameColumn, source_parent);
-
-  return sourceModel()->data(ind, Qt::DisplayRole).toString() == name;
+  return sourceModel()
+             ->data(sourceModel()->index(source_row, nameColumn, source_parent))
+             .toString() == name;
 }
 
 bool SortFilterProxyModel::filteringByNiederschlag(
@@ -46,10 +46,10 @@ bool SortFilterProxyModel::filteringByNiederschlag(
   if (niederschlag.isEmpty())
     return true;
 
-  QModelIndex ind =
-      sourceModel()->index(source_row, niederschlagColumn, source_parent);
-
-  return sourceModel()->data(ind, Qt::DisplayRole).toString() == niederschlag;
+  return sourceModel()
+             ->data(sourceModel()->index(source_row, niederschlagColumn,
+                                         source_parent))
+             .toString() == niederschlag;
 }
 
 bool SortFilterProxyModel::filteringByNacht(
@@ -58,30 +58,24 @@ bool SortFilterProxyModel::filteringByNacht(
   if (nacht.isEmpty())
     return true;
 
-  QModelIndex ind =
-      sourceModel()->index(source_row, nachtColumn, source_parent);
-
-  return sourceModel()->data(ind, Qt::DisplayRole).toString() == nacht;
+  return sourceModel()
+             ->data(
+                 sourceModel()->index(source_row, nachtColumn, source_parent))
+             .toString() == nacht;
 }
 
 bool SortFilterProxyModel::filteringByParameter(
     int source_row, const QModelIndex &source_parent) const {
 
-  if (parameter == 0)
+  if (parameter == Cnt::Parameter::P_PARAMETER)
     return true;
 
-  QModelIndex ind =
-      sourceModel()->index(source_row, parameterColumn, source_parent);
+  QVariant data = sourceModel()->data(
+      sourceModel()->index(source_row, parameterColumn, source_parent));
 
-  return parameter == 3
-             ? sourceModel()->data(ind, Qt::DisplayRole).toDateTime() >=
-                       zeitMin &&
-                   sourceModel()->data(ind, Qt::DisplayRole).toDateTime() <=
-                       zeitMax
-             : sourceModel()->data(ind, Qt::DisplayRole).toInt() >=
-                       parameterMin &&
-                   sourceModel()->data(ind, Qt::DisplayRole).toInt() <=
-                       parameterMax;
+  return parameter == Cnt::Parameter::P_ZEIT
+             ? data.toDateTime() >= zeitMin && data.toDateTime() <= zeitMax
+             : data.toInt() >= parameterMin && data.toInt() <= parameterMax;
 }
 
 void SortFilterProxyModel::setAngelplatz(const QString &angelplatz) {

@@ -1,7 +1,9 @@
 #pragma once
 
+#include <QActionGroup>
 #include <QDebug>
 #include <QLabel>
+#include <QLibraryInfo>
 #include <QMainWindow>
 #include <QPalette>
 #include <QSqlRecord>
@@ -9,14 +11,13 @@
 #include <QStyle>
 #include <QTimer>
 #include <QTranslator>
-#include <QLibraryInfo>
-#include <QActionGroup>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
 #include "AngelplaetzeDAO.h"
 #include "AngelplatzDialog.h"
 #include "AngelplatzWindow.h"
+#include "Constants.h"
 #include "DAOLib.h"
 #include "FischeDAO.h"
 #include "ImageStyleItemDelegate.h"
@@ -47,8 +48,7 @@ private slots:
   void on_actionEnglisch_triggered();
   void tableView_selectionChanged();
   void tableView_section_resized(int index, int oldSize, int newSize);
-  void modifyTableView(const qint64 key,
-                       const AngelplatzDialog::EditMode editMode);
+  void modifyTableView(const qint64 key, const Cnt::EditMode editMode);
   void setColumnAngelplatzWidth(const QList<int> list);
 
 private:
@@ -57,14 +57,14 @@ private:
   AngelplatzDialog *angelplatzDialog;
   AngelplatzWindow *angelplatzWindow;
   QSqlTableModel *model;
-  QTranslator* sysTranslator;
+  QTranslator *sysTranslator;
   bool sysTranslatorInstalled;
-  QTranslator* enTranslator;
+  QTranslator *enTranslator;
   bool enTranslatorInstalled;
   QString currentLanguage;
   QString xmlConfigFile;
-  QList<int> columnMainWidth;
-  QList<int> columnAngelplatzWidth;
+  QList<int> mainColWidthList;
+  QList<int> angelplatzColWidthList;
 
   void init();
   bool openDatabase();
@@ -78,11 +78,11 @@ private:
   void findItemInTableView(const QString &columnName, const QVariant &value);
   // Aktualisiert die TableView nach einer Datensatzänderung
   void updateTableView(const qint64 key);
-  void loadLanguage(const QString& language);
+  void loadLanguage(const QString &language);
   void removeAllTranslators();
-  void readXMLSettings(const QString& filename);
-  void writeXMLSettings(const QString& filename);
+  void readXMLSettings(const QString &filename);
+  void writeXMLSettings(const QString &filename);
   bool eventFilter(QObject *sender, QEvent *event) override;
-  void changeEvent(QEvent* event) override;
+  void changeEvent(QEvent *event) override;
   void closeEvent(QCloseEvent *event) override;
 };

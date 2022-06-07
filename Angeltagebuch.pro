@@ -20,6 +20,7 @@ SOURCES += \
 HEADERS += \
     AngelplatzDialog.h \
     AngelplatzWindow.h \
+    Constants.h \
     FischDialog.h \
     ImageStyleItemDelegate.h \
     MainWindow.h \

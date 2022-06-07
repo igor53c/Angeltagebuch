@@ -8,6 +8,7 @@
 #include "AngelplaetzeDAO.h"
 #include "Angelplatz.h"
 #include "AngelplatzDialog.h"
+#include "Constants.h"
 #include "FischDialog.h"
 #include "FischeDAO.h"
 #include "FischeSqlTableModel.h"
@@ -22,12 +23,15 @@ class AngelplatzWindow : public QMainWindow {
   Q_OBJECT
 
 public:
-  explicit AngelplatzWindow(QList<int> columnAngelplatzWidth,
+  explicit AngelplatzWindow(QList<int> &colAngelplatzWidthList,
                             QString &angelplatzName, QWidget *parent = nullptr);
   ~AngelplatzWindow();
 
 signals:
+  // Eigene Signale
+  // ob sich die Daten in der Datenbank geändert haben
   void dataModified(const qint64 key);
+  //ob sich die Spaltenbreite geändert hat
   void columnWidthModified(const QList<int> list);
 
 private slots:
@@ -44,12 +48,14 @@ private slots:
   void on_sbMax_valueChanged(int);
   void on_dateTimeMax_dateTimeChanged(const QDateTime &);
   void on_tableView_doubleClicked(const QModelIndex &index);
-  void modifyTableView(const qint64 key, const FischDialog::EditMode editMode);
+  // Eigene Slots
+  void modifyTableView(const qint64 key, const Cnt::EditMode editMode);
   void tableView_section_resized(int index, int oldSize, int newSize);
   void tableView_selectionChanged();
 
 private:
   Ui::AngelplatzWindow *ui;
+  // der Name des aktuellen Angelplatzes
   QString angelplatzName;
   QLabel *statusLabel;
   FischeSqlTableModel *model;
@@ -57,8 +63,11 @@ private:
   QString filterFischarten;
   QString filterNiederschlag;
   QString filterNacht;
+  // welcher Parametertyp zum Filtern ausgewählt wird
   int filterParameter;
-  QList<int> columnAngelplatzWidth;
+  // Listenwerte Spaltenbreite
+  QList<int> colAngelplatzWidthList;
+  // Liste der Filter-Combobox-Werte
   QStringList listNacht;
   QStringList listNiederschlag;
 
@@ -74,8 +83,7 @@ private:
   void updateTableView(const qint64 key);
   void showParameterFilter(const bool spinBox, const bool dateTime,
                            const bool text);
+  // Überschriebene Methoden
   // Event filter für die TableView
   bool eventFilter(QObject *sender, QEvent *event) override;
-  // Überschriebene Methoden
-  void closeEvent(QCloseEvent *event) override;
 };

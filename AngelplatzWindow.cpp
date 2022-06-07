@@ -1,7 +1,7 @@
 #include "AngelplatzWindow.h"
 #include "ui_AngelplatzWindow.h"
 
-AngelplatzWindow::AngelplatzWindow(QList<int> columnAngelplatzWidth,
+AngelplatzWindow::AngelplatzWindow(QList<int> &colAngelplatzWidthList,
                                    QString &angelplatzName, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::AngelplatzWindow) {
 
@@ -9,7 +9,7 @@ AngelplatzWindow::AngelplatzWindow(QList<int> columnAngelplatzWidth,
 
   this->angelplatzName = angelplatzName;
 
-  this->columnAngelplatzWidth = columnAngelplatzWidth;
+  this->colAngelplatzWidthList = colAngelplatzWidthList;
 
   init();
 }
@@ -17,40 +17,33 @@ AngelplatzWindow::AngelplatzWindow(QList<int> columnAngelplatzWidth,
 AngelplatzWindow::~AngelplatzWindow() { delete ui; }
 
 void AngelplatzWindow::init() {
-
+  // Fenster maximieren
   this->showMaximized();
 
   model = nullptr;
 
   proxyModel = nullptr;
-
-  // Einen Label für die ANzeige von Meldungen in der Statusbar erzeugen
+  // Einen Label für die Anzeige von Meldungen in der Statusbar erzeugen
   statusLabel = new QLabel(this);
-
   // Den Text horizontal und vertikal in der Mitte ausrichten
   statusLabel->setAlignment(Qt::AlignCenter);
-
   // Der 2. Parameter stretch = 1 dehnt den Label
   // über die gesamte StatusBar aus.
   statusBar()->addWidget(statusLabel, 1);
-
   // Den Event Filter für die tableView installieren
   ui->tableView->installEventFilter(this);
-
   // Ändert die Text- und Hintergrundfarbe der selektierten Zeile der TableView
   // damit die Markierung beim Fokusverlust sichtbar bleibt.
   QPalette palette = ui->tableView->palette();
-
   palette.setColor(QPalette::HighlightedText, Qt::white);
-  palette.setColor(QPalette::Highlight, QColor(0, 112, 255));
-
+  palette.setColor(QPalette::Highlight, Cnt::COLOR_HIGHLIGHT);
+  ui->tableView->setPalette(palette);
+  // Initialisierung globaler Variablen
   listNacht = QStringList() << tr("Ja") << tr("Nein");
 
   listNiederschlag = QStringList() << tr("Sonnig") << tr("Wolkig")
                                    << tr("Regen") << tr("Schnee");
-
-  ui->tableView->setPalette(palette);
-
+  // Combobox-Filtern Werte zuweisen
   ui->cbFischarten->addItems(QStringList() << tr("Fischarten")
                                            << FischeDAO::readFischarten());
 
@@ -63,72 +56,78 @@ void AngelplatzWindow::init() {
                             << tr("Parameter") << tr("Länge") << tr("Gewicht")
                             << tr("Zeit") << tr("Temperatur")
                             << tr("Windgeschwindigkeit") << tr("Luftdruck"));
-
+  // der Parameterfilter wird zunächst nicht angezeigt
   showParameterFilter(false, false, false);
-
+  // Wenn Fische von allen Angelplätzen angezeigt werden, ist die Möglichkeit,
+  // neue Fische hinzuzufügen, nicht erlaubt
   angelplatzName.isEmpty() ? ui->actionNeu->setVisible(false)
+                           // falls nur ein Angelplatz angezeigt wird, werden
+                           // die Daten dieses Angelplatzes geladen
                            : readEntry(angelplatzName);
 
   showTable();
 }
 
 void AngelplatzWindow::setTableViewModel() {
-  // Evtl. vorhandenes QSqlTableModel löschen
-  delete ui->tableView->model();
+  // Evtl. vorhandenes FischeSqlTableModel löschen
+  delete model;
+  // Evtl. vorhandenes SortFilterProxyModel löschen
+  delete proxyModel;
 
-  model = FischeDAO::readFischeIntoTableModel(listNacht, listNiederschlag);
-
+  model =
+      FischeDAO::readFischeIntoTableModel(listNacht, listNiederschlag, this);
+  // Verwenden ein Proxymodel, um Daten zu filtern
   proxyModel = new SortFilterProxyModel(this);
-
   // Spaltenüberschriften der Tabelle setzen
-  model->setHeaderData(model->record().indexOf("PATH"), Qt::Horizontal, "");
-  model->setHeaderData(model->record().indexOf("NAME"), Qt::Horizontal,
+  model->setHeaderData(model->record().indexOf(Cnt::PATH), Qt::Horizontal,
+                       QString());
+  model->setHeaderData(model->record().indexOf(Cnt::NAME), Qt::Horizontal,
                        tr("Name"));
-  model->setHeaderData(model->record().indexOf("ANGELPLATZ"), Qt::Horizontal,
+  model->setHeaderData(model->record().indexOf(Cnt::ANGELPLATZ), Qt::Horizontal,
                        tr("Angelplatz"));
-  model->setHeaderData(model->record().indexOf("LAENGE"), Qt::Horizontal,
+  model->setHeaderData(model->record().indexOf(Cnt::LAENGE), Qt::Horizontal,
                        tr("Länge\n[ cm ]"));
-  model->setHeaderData(model->record().indexOf("GEWICHT"), Qt::Horizontal,
+  model->setHeaderData(model->record().indexOf(Cnt::GEWICHT), Qt::Horizontal,
                        tr("Gewicht\n[ g ]"));
-  model->setHeaderData(model->record().indexOf("ZEIT"), Qt::Horizontal,
+  model->setHeaderData(model->record().indexOf(Cnt::ZEIT), Qt::Horizontal,
                        tr("Zeit\ndd/MM/yyyy HH:mm"));
-  model->setHeaderData(model->record().indexOf("TEMPERATUR"), Qt::Horizontal,
+  model->setHeaderData(model->record().indexOf(Cnt::TEMPERATUR), Qt::Horizontal,
                        tr("Temperatur\n[ °C ]"));
-  model->setHeaderData(model->record().indexOf("WINDGESCHWINDIGKEIT"),
+  model->setHeaderData(model->record().indexOf(Cnt::WINDGESCHWINDIGKEIT),
                        Qt::Horizontal, tr("Windgeschwindigkeit\n[ km/h ]"));
-  model->setHeaderData(model->record().indexOf("LUFTDRUCK"), Qt::Horizontal,
+  model->setHeaderData(model->record().indexOf(Cnt::LUFTDRUCK), Qt::Horizontal,
                        tr("Luftdruck\n[ hPa ]"));
-  model->setHeaderData(model->record().indexOf("IS_NACHT"), Qt::Horizontal,
+  model->setHeaderData(model->record().indexOf(Cnt::IS_NACHT), Qt::Horizontal,
                        tr("Nacht"));
-  model->setHeaderData(model->record().indexOf("NIEDERSCHLAG"), Qt::Horizontal,
-                       tr("Niederschlag"));
-  model->setHeaderData(model->record().indexOf("INFO"), Qt::Horizontal,
+  model->setHeaderData(model->record().indexOf(Cnt::NIEDERSCHLAG),
+                       Qt::Horizontal, tr("Niederschlag"));
+  model->setHeaderData(model->record().indexOf(Cnt::INFO), Qt::Horizontal,
                        tr("Zusätzliche Information"));
-
-  // Aufsteigende Sortierung nach Postleitzahl
-  model->sort(model->record().indexOf("NAME"), Qt::AscendingOrder);
-
+  // Aufsteigende Sortierung nach Name
+  model->sort(model->record().indexOf(Cnt::NAME), Qt::AscendingOrder);
+  // Verwenden eigenes QStyledItemDelegate, um Bilder anzuzeigen
   ImageStyleItemDelegate *delegate = new ImageStyleItemDelegate(this);
-
-  ui->tableView->setItemDelegateForColumn(model->record().indexOf("PATH"),
+  // Bilder nur für die PATH-Spalte anzeigen
+  ui->tableView->setItemDelegateForColumn(model->record().indexOf(Cnt::PATH),
                                           delegate);
-
+  // Anfangswerte für die Tabellenfilterung zuweisen
   proxyModel->setAngelplatz(angelplatzName);
-  proxyModel->setAngelplatzColumn(model->record().indexOf("ANGELPLATZ"));
+  proxyModel->setAngelplatzColumn(model->record().indexOf(Cnt::ANGELPLATZ));
 
   if (!filterFischarten.isEmpty()) {
     proxyModel->setName(filterFischarten);
-    proxyModel->setNameColumn(model->record().indexOf("NAME"));
+    proxyModel->setNameColumn(model->record().indexOf(Cnt::NAME));
   }
 
   if (!filterNiederschlag.isEmpty()) {
     proxyModel->setNiederschlag(filterNiederschlag);
-    proxyModel->setNiederschlagColumn(model->record().indexOf("NIEDERSCHLAG"));
+    proxyModel->setNiederschlagColumn(
+        model->record().indexOf(Cnt::NIEDERSCHLAG));
   }
 
   if (!filterNacht.isEmpty()) {
     proxyModel->setNacht(filterNacht);
-    proxyModel->setNachtColumn(model->record().indexOf("IS_NACHT"));
+    proxyModel->setNachtColumn(model->record().indexOf(Cnt::IS_NACHT));
   }
 
   proxyModel->setParameter(filterParameter);
@@ -136,79 +135,65 @@ void AngelplatzWindow::setTableViewModel() {
   proxyModel->setParameterMax(ui->sbMax->value());
   proxyModel->setZeitMin(ui->dateTimeMin->dateTime());
   proxyModel->setZeitMax(ui->dateTimeMax->dateTime());
-
+  // Passen Sie je nach Wahl des Filterparameters den Spaltenindex an
   switch (filterParameter) {
-  case 1:
-    proxyModel->setParameterColumn(model->record().indexOf("LAENGE"));
+  case Cnt::Parameter::P_LAENGE:
+    proxyModel->setParameterColumn(model->record().indexOf(Cnt::LAENGE));
     break;
-  case 2:
-    proxyModel->setParameterColumn(model->record().indexOf("GEWICHT"));
+  case Cnt::Parameter::P_GEWICHT:
+    proxyModel->setParameterColumn(model->record().indexOf(Cnt::GEWICHT));
     break;
-  case 3:
-    proxyModel->setParameterColumn(model->record().indexOf("ZEIT"));
+  case Cnt::Parameter::P_ZEIT:
+    proxyModel->setParameterColumn(model->record().indexOf(Cnt::ZEIT));
     break;
-  case 4:
-    proxyModel->setParameterColumn(model->record().indexOf("TEMPERATUR"));
+  case Cnt::Parameter::P_TEMPERATUR:
+    proxyModel->setParameterColumn(model->record().indexOf(Cnt::TEMPERATUR));
     break;
-  case 5:
+  case Cnt::Parameter::P_WINDGESCHWINDIGKEIT:
     proxyModel->setParameterColumn(
-        model->record().indexOf("WINDGESCHWINDIGKEIT"));
+        model->record().indexOf(Cnt::WINDGESCHWINDIGKEIT));
     break;
-  case 6:
-    proxyModel->setParameterColumn(model->record().indexOf("LUFTDRUCK"));
+  case Cnt::Parameter::P_LUFTDRUCK:
+    proxyModel->setParameterColumn(model->record().indexOf(Cnt::LUFTDRUCK));
     break;
   }
-
   // Das Datenmodel zur tableView zuweisen
   ui->tableView->setModel(proxyModel);
 
   proxyModel->setSourceModel(model);
-
-  // Die TableView liest initial nur die ersten 256 Datensätze.
-  // Das ist im Datenmodell festgelegt.
-
-  // Wenn aber von Anfang an alle Datensätze benötigt werden, kann
-  // man mit folgender Anweisung die vollständige Anzahl der Datensätze
-  // im Datenmodell ermitteln
+  // Übernahme aller Daten in das Datenmodell
   while (model->canFetchMore())
     model->fetchMore();
-
   // Signal für die Anzeige des aktuellen Datensatzes in der Statusbar
   connect(ui->tableView->selectionModel(),
           &QItemSelectionModel::selectionChanged, this,
           &AngelplatzWindow::tableView_selectionChanged);
-
   // Signal für die Änderung der Spaltenbreite in der TableView
   connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionResized, this,
           &AngelplatzWindow::tableView_section_resized);
-
-  //  return model;
 }
 
 void AngelplatzWindow::showTable() {
 
   setTableViewModel();
-
   // Feste Höhe für die Tabellenüberschrift
-  ui->tableView->horizontalHeader()->setFixedHeight(50);
-
-  for (int i = 0; i < columnAngelplatzWidth.size(); i++)
-    ui->tableView->setColumnWidth(i, columnAngelplatzWidth[i]);
-
+  ui->tableView->horizontalHeader()->setFixedHeight(
+      Cnt::ANGELPLATZ_HEADER_HEIGHT);
+  // Anpassen der Spaltenbreiten der vorherigen Einstellung des Benutzers
+  for (int i = 0; i < colAngelplatzWidthList.size(); i++)
+    ui->tableView->setColumnWidth(i, colAngelplatzWidthList[i]);
   // Alle Spaltenüberschriften linksbündig
   ui->tableView->horizontalHeader()->setDefaultAlignment(
       Qt::AlignmentFlag::AlignLeft | Qt::AlignmentFlag::AlignVCenter);
-
   // Spalte PRIMARYKEY unsichtbar machen
-  ui->tableView->hideColumn(model->record().indexOf("PRIMARYKEY"));
-
+  ui->tableView->hideColumn(model->record().indexOf(Cnt::PRIMARYKEY));
   // Aktivieren/Deaktivieren der Komponenten, abhängig davon,
   // ob Datensätze gelesen wurden.
   ui->tableView->setEnabled(proxyModel->rowCount());
   ui->actionNdern->setEnabled(ui->tableView->isEnabled());
   ui->actionLschen->setEnabled(ui->tableView->isEnabled());
-
-  // Erste Zeile auswählen
+  // Erste Zeile auswählen, oder eine Meldung ausgeben, dass der Datensatz ist
+  // leer
   ui->tableView->isEnabled()
       ? ui->tableView->selectRow(0)
       : statusLabel->setText(tr("Der Datensatz ist leer."));
@@ -216,23 +201,25 @@ void AngelplatzWindow::showTable() {
 
 void AngelplatzWindow::readEntry(const QString &name) {
 
-  ui->image->setScaledContents(false);
-
   QString path = AngelplaetzeDAO::readAngelplatzPath(name);
 
-  if (!path.isEmpty())
+  if (!path.isEmpty()) {
+    // Bildskalierung deaktivieren
+    ui->image->setScaledContents(false);
+    // das Bild wird gesetzt, wenn ein Bildlink vorhanden ist
     ui->image->setPixmap(QPixmap::fromImage(QImage(path))
                              .scaled(ui->image->width(), ui->image->height(),
                                      Qt::KeepAspectRatio,
                                      Qt::SmoothTransformation));
-
+  }
+  // der Name des Angelplatzes unter dem Bild
   ui->lblAngelplatzInfo->setText(name);
 }
 
 void AngelplatzWindow::showFischDialog(const qint64 key) {
   // Dialog auf dem Stack erstellen
   FischDialog fischDialog(angelplatzName, key, this);
-
+  // Die Signale für UPDATE und NEW mit einem Slot verbinden
   connect(&fischDialog, &FischDialog::dataModified, this,
           &AngelplatzWindow::modifyTableView);
 
@@ -240,44 +227,39 @@ void AngelplatzWindow::showFischDialog(const qint64 key) {
 }
 
 void AngelplatzWindow::deleteEntry(const QModelIndex &index) {
-  // Das Datenmodell der TableView in ein QSqlTableModel konvertieren
-  // FischQSqlTableModel *model = getTableViewModel();
-
+  // Quellmodellindex
   auto sourceIndex = proxyModel->mapToSource(index);
-
   // Ermitteln des Primärschlüssels in Spalte 'PRIMARYKEY' über den als
   // Parameter übergebenen QModelIndex.
   qint64 key =
-      model->record(sourceIndex.row()).value("PRIMARYKEY").toLongLong();
+      model->record(sourceIndex.row()).value(Cnt::PRIMARYKEY).toLongLong();
 
   int msgValue = QMessageBox::question(
       this, this->windowTitle(),
       tr("Datensatz löschen:\n") +
-          model->record(sourceIndex.row()).value("NAME").toString(),
+          model->record(sourceIndex.row()).value(Cnt::NAME).toString(),
       QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
 
   if (msgValue == QMessageBox::Cancel)
     return;
-
+  // falls angelplatzName leer ist, nimmt einen neuen Wert an
   QString newAngelplatzName = angelplatzName;
 
   if (angelplatzName.isEmpty())
     newAngelplatzName = FischeDAO::readFischAngelplatz(key);
 
-  // Löschen der Postleitzahl über den Primärschlüssel
+  // Löschen der Fisch über den Primärschlüssel
   if (FischeDAO::deleteFisch(key) &&
       AngelplaetzeDAO::changeNumberFische(newAngelplatzName, -1)) {
-
+    // Meldung, wenn sich die Daten in der Datenbank geändert haben
     emit dataModified(AngelplaetzeDAO::readAngelplatzKey(newAngelplatzName));
 
     statusLabel->setText(tr("Einträge werden aktualisiert..."));
     QApplication::processEvents();
-
-    // Postleitzahlen neu in das Datenmodell einlesen
+    // Fische neu in das Datenmodell einlesen
     showTable();
 
     int row = (index.row() - 1 < 0) ? 0 : index.row() - 1;
-
     // Prüfen, ob die ermittelte Zeile selektiert werden kann
     if (ui->tableView->model()->rowCount() >= row)
       ui->tableView->selectRow(row);
@@ -291,51 +273,40 @@ void AngelplatzWindow::refreshTableView(const qint64 key) {
 
   statusLabel->setText(tr("Einträge werden aktualisiert..."));
   QApplication::processEvents();
-
+  // falls ein neuer Wert in die Datenbank eingefügt wird
   AngelplaetzeDAO::changeNumberFische(angelplatzName, 1);
-
+  // Meldung, wenn sich die Daten in der Datenbank geändert haben
   emit dataModified(AngelplaetzeDAO::readAngelplatzKey(angelplatzName));
-
+  // Combobox Fischarten aktualisieren
   ui->cbFischarten->clear();
   ui->cbFischarten->addItems(QStringList() << tr("Fischarten")
                                            << FischeDAO::readFischarten());
-
-  // Postleitzahlen neu in das Datenmodell einlesen
+  // Fische neu in das Datenmodell einlesen
   showTable();
-
   // Den Cursor auf den neuen Eintrag über den Primärschlüssel positionieren
-  findItemInTableView("PRIMARYKEY", QVariant(key));
+  findItemInTableView(Cnt::PRIMARYKEY, QVariant(key));
 }
 
 void AngelplatzWindow::findItemInTableView(const QString &columnName,
                                            const QVariant &value) {
   int row;
   bool found = false;
-
-  // Konvertieren des Datenmodells der tableView in ein SqlTableModel
-  // FischQSqlTableModel *model = getTableViewModel();
-
   // Auf die Query/Datensätze innerhalb des Datenmodells zugreifen
   QSqlQuery query = model->query();
-
   // Spaltenindex des Spaltennamens über den Datensatz des Datenmodells
   // ermitteln und damit prüfen, ob der Spaltenname auch exisitiert. Nur diese
   // Spalte wird nach dem angegebenen Wert durchsucht.
-
   int colIndex = model->record().indexOf(columnName);
 
   if (colIndex < 0)
     return;
-
   // Auf den ersten Eintrag in der Query positionieren
   query.first();
-
   // Die Zeile auf den Anfangswert der Suche setzen
   row = query.at();
 
   do {
     // Der Suchbegriff kann irgendwo innerhalb der Spalte enthalten sein.
-    // Groß-/Kleinschreibung wird nicht berücksichtigt.
     if (query.value(colIndex).toLongLong() == value.toLongLong()) {
       found = true;
       break;
@@ -361,29 +332,28 @@ void AngelplatzWindow::updateTableView(const qint64 key) {
   QModelIndex index;
 
   auto changeData = [&](QString column, auto data) {
-    // Einen Index erstellen, der auf die Spalte 'PLZ'
+    // Erstellen einen Index, der auf eine bestimmte Spalte zeigt
     index = model->index(sourceIndex.row(), model->record().indexOf(column));
-    // Postleitzahl im Datenmodell über den Index ändern
+    // Die Variable Column im Datenmodell über den Index ändern
     model->setData(index, QVariant(data), Qt::EditRole);
-    // Die TableView informieren, dass die Postleitzahl geändert wurde und
+    // Die TableView informieren, dass die Werte geändert wurde und
     // aktualisiert werden muss
     emit model->dataChanged(index, index);
   };
 
-  changeData("PATH", fisch->getPath());
-  changeData("NAME", fisch->getName());
-  changeData("ANGELPLATZ", fisch->getAngelplatz());
-  changeData("LAENGE", fisch->getLaenge());
-  changeData("GEWICHT", fisch->getGewicht());
-  changeData("ZEIT", fisch->getZeit());
-  changeData("TEMPERATUR", fisch->getTemperatur());
-  changeData("WINDGESCHWINDIGKEIT", fisch->getWindgeschwindigkeit());
-  changeData("LUFTDRUCK", fisch->getLuftdruck());
-  changeData("IS_NACHT", fisch->getIsNacht());
-  changeData("NIEDERSCHLAG", fisch->getNiederschlag());
-  changeData("INFO", fisch->getInfo());
-
-  // Objekt angelplatz vom Heap löschen
+  changeData(Cnt::PATH, fisch->getPath());
+  changeData(Cnt::NAME, fisch->getName());
+  changeData(Cnt::ANGELPLATZ, fisch->getAngelplatz());
+  changeData(Cnt::LAENGE, fisch->getLaenge());
+  changeData(Cnt::GEWICHT, fisch->getGewicht());
+  changeData(Cnt::ZEIT, fisch->getZeit());
+  changeData(Cnt::TEMPERATUR, fisch->getTemperatur());
+  changeData(Cnt::WINDGESCHWINDIGKEIT, fisch->getWindgeschwindigkeit());
+  changeData(Cnt::LUFTDRUCK, fisch->getLuftdruck());
+  changeData(Cnt::IS_NACHT, fisch->getIsNacht());
+  changeData(Cnt::NIEDERSCHLAG, fisch->getNiederschlag());
+  changeData(Cnt::INFO, fisch->getInfo());
+  // Objekt fisch vom Heap löschen
   delete fisch;
 }
 
@@ -394,34 +364,36 @@ void AngelplatzWindow::showParameterFilter(const bool spinBox,
   ui->sbMax->setVisible(spinBox);
   ui->dateTimeMin->setVisible(dateTime);
   ui->dateTimeMax->setVisible(dateTime);
-  ui->lblMin->setText(text ? "Min" : "");
-  ui->lblMax->setText(text ? "Max" : "");
+  ui->lblMin->setText(text ? "Min" : QString());
+  ui->lblMax->setText(text ? "Max" : QString());
 }
 
 void AngelplatzWindow::modifyTableView(const qint64 key,
-                                       const FischDialog::EditMode editMode) {
+                                       const Cnt::EditMode editMode) {
   switch (editMode) {
-  case FischDialog::EditMode::NEW:
+  case Cnt::EditMode::NEW:
     refreshTableView(key);
     break;
 
-  case FischDialog::EditMode::UPDATE:
+  case Cnt::EditMode::UPDATE:
     updateTableView(key);
     break;
   }
 }
 
 void AngelplatzWindow::tableView_section_resized(int index, int, int newSize) {
-  // Nur auf die Änderung der 1 Spalte (Bild) reagieren
-  if (index == model->record().indexOf("PATH"))
+  // Nur auf die Änderung der PATH Spalte (Bild) reagieren
+  if (index == model->record().indexOf(Cnt::PATH))
     ui->tableView->verticalHeader()->setDefaultSectionSize(newSize);
-
-  if (columnAngelplatzWidth.size() > index)
-    columnAngelplatzWidth[index] = newSize;
+  // Wertänderung in der globalen Variablen
+  if (colAngelplatzWidthList.size() > index)
+    colAngelplatzWidthList[index] = newSize;
+  // Meldung, dass sich die Daten der Spaltenbreite geändert haben
+  emit columnWidthModified(colAngelplatzWidthList);
 }
 
 void AngelplatzWindow::tableView_selectionChanged() {
-
+  // anzeigen, welcher Datensatz ausgewählt ist
   statusLabel->setText(
       QString(tr("Datensatz %L1 von %L2"))
           .arg(ui->tableView->selectionModel()->currentIndex().row() + 1)
@@ -434,35 +406,30 @@ bool AngelplatzWindow::eventFilter(QObject *sender, QEvent *event) {
     if (event->type() == QEvent::KeyPress) {
       QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
-      // Home-Taste (Pos1)
-      if (keyEvent->key() == Qt::Key_Home) {
+      switch (keyEvent->key()) {
+        // Home-Taste (Pos1)
+      case Qt::Key_Home:
         ui->tableView->scrollToTop();
         ui->tableView->selectRow(0);
-      }
-      // End-Taste (Ende)
-      else if (keyEvent->key() == Qt::Key_End) {
+        break;
+        // End-Taste (Ende)
+      case Qt::Key_End:
         ui->tableView->scrollToBottom();
         ui->tableView->selectRow(ui->tableView->model()->rowCount() - 1);
-      }
-      // Return-Taste zur Auswahl eines Eintrags
-      else if (keyEvent->key() == Qt::Key_Return) {
+        break;
+        // Return-Taste zur Auswahl eines Eintrags
+      case Qt::Key_Return:
         on_tableView_doubleClicked(ui->tableView->currentIndex());
-      }
-      // Entf-Taste zum Löschen eines Eintrags
-      else if (keyEvent->key() == Qt::Key_Delete) {
+        break;
+        // Entf-Taste zum Löschen eines Eintrags
+      case Qt::Key_Delete:
         deleteEntry(ui->tableView->currentIndex());
+        break;
       }
     }
   }
 
   return QObject::eventFilter(sender, event);
-}
-
-void AngelplatzWindow::closeEvent(QCloseEvent *event) {
-
-  emit columnWidthModified(columnAngelplatzWidth);
-
-  event->accept();
 }
 
 void AngelplatzWindow::on_actionBEenden_triggered() { close(); }
@@ -474,14 +441,14 @@ void AngelplatzWindow::on_actionNdern_triggered() {
   showFischDialog(
       model
           ->record(proxyModel->mapToSource(ui->tableView->currentIndex()).row())
-          .value("PRIMARYKEY")
+          .value(Cnt::PRIMARYKEY)
           .toLongLong());
 }
 
 void AngelplatzWindow::on_tableView_doubleClicked(const QModelIndex &index) {
 
   showFischDialog(model->record(proxyModel->mapToSource(index).row())
-                      .value("PRIMARYKEY")
+                      .value(Cnt::PRIMARYKEY)
                       .toLongLong());
 }
 
@@ -514,55 +481,55 @@ void AngelplatzWindow::on_cbNacht_currentTextChanged(const QString &text) {
 }
 
 void AngelplatzWindow::on_cbParameter_currentIndexChanged(int index) {
-
+  // Festlegen des SpinBox-Werts nach Auswahl eines anderen Parametertyps
   auto setMinMax = [&](int min, int max) {
     ui->sbMin->setRange(min, max);
     ui->sbMin->setValue(min);
     ui->sbMax->setRange(min, max);
     ui->sbMax->setValue(max);
   };
-
+  // je nach Wahl der ComboBox, was angezeigt werden soll
   index == 0   ? showParameterFilter(false, false, false)
   : index == 3 ? showParameterFilter(false, true, true)
                : showParameterFilter(true, false, true);
-
+  // Mindest- und Höchstwerte einstellen
   switch (index) {
-  case 1:
-    setMinMax(FischeDAO::getMinParameter("LAENGE").toInt(),
-              FischeDAO::getMaxParameter("LAENGE").toInt());
+  case Cnt::Parameter::P_LAENGE:
+    setMinMax(FischeDAO::getMinParameter(Cnt::LAENGE).toInt(),
+              FischeDAO::getMaxParameter(Cnt::LAENGE).toInt());
     break;
-  case 2:
-    setMinMax(FischeDAO::getMinParameter("GEWICHT").toInt(),
-              FischeDAO::getMaxParameter("GEWICHT").toInt());
+  case Cnt::Parameter::P_GEWICHT:
+    setMinMax(FischeDAO::getMinParameter(Cnt::GEWICHT).toInt(),
+              FischeDAO::getMaxParameter(Cnt::GEWICHT).toInt());
     break;
-  case 3: {
-    QDateTime min = FischeDAO::getMinParameter("ZEIT").toDateTime();
-    QDateTime max = FischeDAO::getMaxParameter("ZEIT").toDateTime();
+  case Cnt::Parameter::P_ZEIT: {
+    QDateTime min = FischeDAO::getMinParameter(Cnt::ZEIT).toDateTime();
+    QDateTime max = FischeDAO::getMaxParameter(Cnt::ZEIT).toDateTime();
 
     ui->dateTimeMin->setDateTimeRange(min, max);
     ui->dateTimeMin->setDateTime(min);
     ui->dateTimeMax->setDateTimeRange(min, max);
     ui->dateTimeMax->setDateTime(max);
   } break;
-  case 4:
-    setMinMax(FischeDAO::getMinParameter("TEMPERATUR").toInt(),
-              FischeDAO::getMaxParameter("TEMPERATUR").toInt());
+  case Cnt::Parameter::P_TEMPERATUR:
+    setMinMax(FischeDAO::getMinParameter(Cnt::TEMPERATUR).toInt(),
+              FischeDAO::getMaxParameter(Cnt::TEMPERATUR).toInt());
     break;
-  case 5:
-    setMinMax(FischeDAO::getMinParameter("WINDGESCHWINDIGKEIT").toInt(),
-              FischeDAO::getMaxParameter("WINDGESCHWINDIGKEIT").toInt());
+  case Cnt::Parameter::P_WINDGESCHWINDIGKEIT:
+    setMinMax(FischeDAO::getMinParameter(Cnt::WINDGESCHWINDIGKEIT).toInt(),
+              FischeDAO::getMaxParameter(Cnt::WINDGESCHWINDIGKEIT).toInt());
     break;
-  case 6:
-    setMinMax(FischeDAO::getMinParameter("LUFTDRUCK").toInt(),
-              FischeDAO::getMaxParameter("LUFTDRUCK").toInt());
+  case Cnt::Parameter::P_LUFTDRUCK:
+    setMinMax(FischeDAO::getMinParameter(Cnt::LUFTDRUCK).toInt(),
+              FischeDAO::getMaxParameter(Cnt::LUFTDRUCK).toInt());
     break;
   }
-
+  // welcher Parametertyp zum Filtern ausgewählt wird
   filterParameter = index;
 
   showTable();
 }
-
+// aktualisieren Sie die Tabellenanzeige nach jeder Wertänderung
 void AngelplatzWindow::on_sbMin_valueChanged(int) { showTable(); }
 
 void AngelplatzWindow::on_dateTimeMin_dateTimeChanged(const QDateTime &) {

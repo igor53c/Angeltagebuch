@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QSortFilterProxyModel>
 
+#include "Constants.h"
+
 class SortFilterProxyModel : public QSortFilterProxyModel {
 
 public:

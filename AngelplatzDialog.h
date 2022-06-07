@@ -8,6 +8,8 @@
 #include <QMessageBox>
 
 #include "AngelplaetzeDAO.h"
+#include "Constants.h"
+#include "FischeDAO.h"
 
 namespace Ui {
 class AngelplatzDialog;
@@ -20,11 +22,10 @@ public:
   explicit AngelplatzDialog(qint64 key, QWidget *parent = nullptr);
   ~AngelplatzDialog();
 
-  enum EditMode { NEW, UPDATE };
-
 signals:
-  void dataModified(const qint64 key,
-                    const AngelplatzDialog::EditMode editMode);
+  // Eigenes Signal
+  // ob sich die Daten in der Datenbank geändert haben
+  void dataModified(const qint64 key, const Cnt::EditMode editMode);
 
 private slots:
   void on_btnAbbrechen_clicked();
@@ -42,11 +43,15 @@ private slots:
   void on_textOrt_returnPressed();
   void on_textLand_returnPressed();
 
-  private:
+private:
   Ui::AngelplatzDialog *ui;
+  // der Primärschlüssel des aktuellen Angelplatzes
   qint64 dlgKey;
+  // Bildlink für aktuellen Angelplatz
   QString imagePath;
+  // ob sich Daten geändert haben
   bool isModified;
+  // Anzahl der Fische an diesem Angelplatz
   int fische;
 
   void init();
@@ -58,6 +63,9 @@ private slots:
   bool updateEntry(const qint64 key);
   bool insertEntry();
   void importImage();
+  // Überschriebene Methoden
+  // Um das Schließne des Dialogs zu überwachen
   void closeEvent(QCloseEvent *event) override;
+  // wegen der ESC-Taste
   void reject() override;
 };

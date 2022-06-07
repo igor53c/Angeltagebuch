@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include "Constants.h"
 #include "Fisch.h"
 #include "FischeDAO.h"
 
@@ -22,10 +23,8 @@ public:
                        QWidget *parent = nullptr);
   ~FischDialog();
 
-  enum EditMode { NEW, UPDATE };
-
 signals:
-  void dataModified(const qint64 key, const EditMode editMode);
+  void dataModified(const qint64 key, const Cnt::EditMode editMode);
 
 private slots:
   void on_btnAbbrechen_clicked();
