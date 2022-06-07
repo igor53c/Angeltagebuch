@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include <QStyledItemDelegate>
 
+// Eigene Bildanzeigeklasse
 // Muss von QStyledItemDelegate abgeleitet werden
 class ImageStyleItemDelegate : public QStyledItemDelegate {
 
@@ -14,7 +15,7 @@ class ImageStyleItemDelegate : public QStyledItemDelegate {
 
 public:
   ImageStyleItemDelegate(QWidget *parent = nullptr);
-
+  // Überschriebene Methode
   void paint(QPainter *painter, const QStyleOptionViewItem &option,
              const QModelIndex &index) const override;
 };

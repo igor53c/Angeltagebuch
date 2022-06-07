@@ -8,8 +8,6 @@
 #include <QPalette>
 #include <QSqlRecord>
 #include <QSqlTableModel>
-#include <QStyle>
-#include <QTimer>
 #include <QTranslator>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -36,7 +34,6 @@ public:
   ~MainWindow();
 
 private slots:
-
   void on_actionBEenden_triggered();
   void on_actionNeu_triggered();
   void on_actionLschen_triggered();
@@ -46,9 +43,11 @@ private slots:
   void on_actionAlleAngelpltze_triggered();
   void on_actionDeutsch_triggered();
   void on_actionEnglisch_triggered();
+  // Eigene Slots
   void tableView_selectionChanged();
   void tableView_section_resized(int index, int oldSize, int newSize);
   void modifyTableView(const qint64 key, const Cnt::EditMode editMode);
+  // Einstellen des Spaltenbreitenwerts, gesendetes Signal von AngelplatzWindow
   void setColumnAngelplatzWidth(const QList<int> list);
 
 private:
@@ -67,7 +66,6 @@ private:
   QList<int> angelplatzColWidthList;
 
   void init();
-  bool openDatabase();
   void setTableViewModel();
   void showTable();
   void showAngelplatzDialog(const qint64 key);
@@ -82,6 +80,7 @@ private:
   void removeAllTranslators();
   void readXMLSettings(const QString &filename);
   void writeXMLSettings(const QString &filename);
+  // Überschriebene Methoden
   bool eventFilter(QObject *sender, QEvent *event) override;
   void changeEvent(QEvent *event) override;
   void closeEvent(QCloseEvent *event) override;

@@ -24,6 +24,8 @@ public:
   ~FischDialog();
 
 signals:
+  // Eigenes Signal
+  // Ob sich die Daten in der Datenbank geändert haben
   void dataModified(const qint64 key, const Cnt::EditMode editMode);
 
 private slots:
@@ -45,10 +47,15 @@ private slots:
 
 private:
   Ui::FischDialog *ui;
+  // Der Name des aktuellen Angelplatzes
   QString angelplatzName;
+  // Der Primärschlüssel zum aktuellen Fisch
   qint64 dlgKey;
+  // Bildlink für aktuellen Fisch
   QString imagePath;
+  // Ob sich Daten geändert haben
   bool isModified;
+  // ComboBox-Werteliste
   QStringList niederschlagList;
 
   void init();
@@ -59,6 +66,9 @@ private:
   bool updateEntry(const QString &name, const qint64 key);
   bool insertEntry(const QString &name);
   void importImage();
+  // Überschriebene Methoden
+  // Um das Schließne des Dialogs zu überwachen
   void closeEvent(QCloseEvent *event) override;
+  // Wegen der ESC-Taste
   void reject() override;
 };

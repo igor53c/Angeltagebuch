@@ -10,10 +10,10 @@ class SortFilterProxyModel : public QSortFilterProxyModel {
 
 public:
   SortFilterProxyModel(QObject *parent = nullptr);
-
+  // Überschriebene Methode
   bool filterAcceptsRow(int source_row,
                         const QModelIndex &source_parent) const override;
-
+  // Setters
   void setAngelplatz(const QString &angelplatz);
   void setAngelplatzColumn(const int angelplatzColumn);
   void setName(const QString &name);

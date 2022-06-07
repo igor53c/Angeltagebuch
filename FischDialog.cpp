@@ -16,55 +16,57 @@ FischDialog::FischDialog(QString &angelplatzName, qint64 key, QWidget *parent)
 FischDialog::~FischDialog() { delete ui; }
 
 void FischDialog::init() {
-
+  // Initialisierung der ComboBox-Werteliste
   niederschlagList = QStringList() << tr("Sonnig") << tr("Wolkig")
                                    << tr("Regen") << tr("Schnee");
-
+  // Stellen die DateTime-Spinbox auf die aktuelle Zeit ein
   ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
-
+  // Initialisierung der ComboBox
   ui->cbNiederschlag->addItems(niederschlagList);
 
   ui->cbFischarten->addItems(QStringList() << tr("Fischarten")
                                            << FischeDAO::readFischarten());
 
   if (dlgKey > 0)
+    // Lesen von Daten für einen bestehenden Dialog
     readEntry(dlgKey);
-
+  // Mit Update wird textFischarten zunächst nicht angezeigt. Bei einem neuen
+  // Eintrag wird der textFischarten angezeigt
   ui->textFischarten->setVisible(!(dlgKey > 0));
-
   ui->lblFischartenSpace->setVisible(dlgKey > 0);
 
   setIsModified(false);
-
+  // Fokuseinstellung
   ui->cbFischarten->setFocus();
 }
 
 void FischDialog::setIsModified(const bool isModified) {
   this->isModified = isModified;
+  // Wenn nichts geändert wird, ist btnSpeichern deaktiviert
   ui->btnSpeichern->setEnabled(isModified);
 }
 
 void FischDialog::readEntry(const qint64 key) {
-
+  // Laden von Daten aus der Datenbank für den aktuellen Fisch
   Fisch *fisch = FischeDAO::readFisch(key);
-
+  // Wenn das Laden der Daten fehlgeschlagen ist
   if (fisch == nullptr)
     return;
-
+  // Speichern des Bildlinks in einer globalen Variablen
   imagePath = fisch->getPath();
 
   if (!imagePath.isEmpty()) {
-
+    // Bildskalierung deaktivieren
     ui->image->setScaledContents(false);
-
+    // Das Bild wird gesetzt, wenn ein Bildlink vorhanden ist
     ui->image->setPixmap(QPixmap::fromImage(QImage(imagePath))
                              .scaled(ui->image->width(), ui->image->height(),
                                      Qt::KeepAspectRatio,
                                      Qt::SmoothTransformation));
   }
-
+  // Speichern den Namen des Angelplatzes in einer globalen Variablen
   angelplatzName = fisch->getAngelplatz();
-
+  // Eingabe von Daten in Dialogfeldern
   ui->cbFischarten->setCurrentText(fisch->getName());
   ui->sbLaenge->setValue(fisch->getLaenge());
   ui->sbGewicht->setValue(fisch->getGewicht());
@@ -76,37 +78,38 @@ void FischDialog::readEntry(const qint64 key) {
   ui->cbNiederschlag->setCurrentText(
       niederschlagList[fisch->getNiederschlag()]);
   ui->textInfo->setText(fisch->getInfo());
-
-  // Objekt plz vom Heap löschen
+  // Objekt fisch vom Heap löschen
   delete fisch;
 }
 
 bool FischDialog::saveEntry() {
 
   bool retValue = false;
-
+  // Der Name für den Fisch muss gewählt werden
   if (ui->cbFischarten->currentIndex() == 0 &&
       ui->textFischarten->text().isEmpty()) {
 
     QMessageBox::critical(this, this->windowTitle(), tr("Eingabe fehlt"));
+    // Anpassen des Fokus auf ein ungültiges Feld
     ui->textFischarten->setFocus();
     return retValue;
   }
-
+  // Wert für den Namen aus der ComboBox oder aus dem Feld textFischarten
   QString name = ui->cbFischarten->currentIndex() == 0
                      ? ui->textFischarten->text()
                      : ui->cbFischarten->currentText();
-
+  // Lambda-Funktion für update und new
   auto fun = [&](bool value, Cnt::EditMode mode) {
     retValue = value;
 
     if (retValue)
+      // Meldung, wenn sich die Daten in der Datenbank geändert haben
       emit dataModified(dlgKey, mode);
   };
-
+  // Wenn es einen Angelplatz gibt, aktualisieren Sie die Daten und wenn nicht,
+  // fügen Sie einen neuen Angelplatz ein
   dlgKey > 0 ? fun(updateEntry(name, dlgKey), Cnt::EditMode::UPDATE)
              : fun(insertEntry(name), Cnt::EditMode::NEW);
-
   // Modified Flag
   isModified = !retValue;
 
@@ -116,17 +119,15 @@ bool FischDialog::saveEntry() {
 bool FischDialog::querySave() {
 
   bool retValue = false;
-
   // Wenn keine Änderungen vorgenommen wurden, den Dialog schließen
   if (!isModified)
     return true;
-
+  // Nachricht zur Datenspeicherung
   int msgValue = QMessageBox::warning(
       this, this->windowTitle(),
       tr("Daten wurden geändert.\nSollen die Änderungen gespeichert werden?"),
       QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
       QMessageBox::Cancel);
-
   // Änderungen verwerfen und den Dialog schließen
   if (msgValue == QMessageBox::Discard)
     retValue = true;
@@ -141,7 +142,7 @@ bool FischDialog::querySave() {
 }
 
 bool FischDialog::updateEntry(const QString &name, const qint64 key) {
-
+  // Überprüfen, ob ein Fisch mit diesem Primärschlüssel existiert
   if (!FischeDAO::fischExists(key))
     return false;
 
@@ -164,22 +165,21 @@ bool FischDialog::insertEntry(const QString &name) {
 }
 
 void FischDialog::importImage() {
-  // Gibt das Heimverzeichnis des Benutzers zurück
+  // Standard-Bilderweiterungen
   QString defaultFilter =
       tr("Alle Bilddateien (*.jpeg *.jpg *.bmp *.png *.jfif)");
-
   // Dateiauswahl Dialog
   QString newImagePath = QFileDialog::getOpenFileName(
       this, tr("Bild hochladen"), QDir::currentPath(),
       tr("Alle Dateien (*.*);;") + defaultFilter, &defaultFilter);
-
+  // Ob ein Bild ausgewählt ist
   if (newImagePath.isEmpty())
     return;
-
+  // Speichern des Bildlinks in einer globalen Variablen
   imagePath = newImagePath;
-
+  // Bildskalierung deaktivieren
   ui->image->setScaledContents(false);
-
+  // Das Bild wird gesetzt, wenn ein Bildlink vorhanden ist
   ui->image->setPixmap(QPixmap::fromImage(QImage(imagePath))
                            .scaled(ui->image->width(), ui->image->height(),
                                    Qt::KeepAspectRatio,
@@ -187,14 +187,14 @@ void FischDialog::importImage() {
 }
 
 void FischDialog::closeEvent(QCloseEvent *event) {
-
+  // Prüfen vor dem Beenden, ob die eingegebenen Daten gespeichert werden sollen
   querySave() ? event->accept() : event->ignore();
 }
 
 void FischDialog::reject() { close(); }
 
 void FischDialog::on_btnAbbrechen_clicked() { close(); }
-
+// Bei jeder Wertänderung ist isModified = true
 void FischDialog::on_btnBildHochladen_clicked() {
 
   setIsModified(true);
@@ -203,7 +203,7 @@ void FischDialog::on_btnBildHochladen_clicked() {
 }
 
 void FischDialog::on_btnSpeichern_clicked() {
-
+  // Überprüfen, ob etwas geändert wurde und ob das Speichern erfolgreich war
   if (isModified && !saveEntry())
     return;
 
@@ -213,9 +213,8 @@ void FischDialog::on_btnSpeichern_clicked() {
 void FischDialog::on_cbFischarten_currentIndexChanged(int index) {
 
   setIsModified(true);
-
+  // Nur für den Anfangswert der ComboBox wird das Feld textFischarten angezeigt
   ui->textFischarten->setVisible(index == 0);
-
   ui->lblFischartenSpace->setVisible(index != 0);
 }
 
@@ -246,5 +245,5 @@ void FischDialog::on_cbNiederschlag_currentTextChanged(const QString &) {
 }
 
 void FischDialog::on_textInfo_textChanged() { setIsModified(true); }
-
+// Nach Drücken der Enter-Taste wird automatisch zum nächsten Feld gewechselt
 void FischDialog::on_textFischarten_returnPressed() { this->focusNextChild(); }

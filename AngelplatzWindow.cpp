@@ -21,7 +21,6 @@ void AngelplatzWindow::init() {
   this->showMaximized();
 
   model = nullptr;
-
   proxyModel = nullptr;
   // Einen Label für die Anzeige von Meldungen in der Statusbar erzeugen
   statusLabel = new QLabel(this);
@@ -56,7 +55,7 @@ void AngelplatzWindow::init() {
                             << tr("Parameter") << tr("Länge") << tr("Gewicht")
                             << tr("Zeit") << tr("Temperatur")
                             << tr("Windgeschwindigkeit") << tr("Luftdruck"));
-  // der Parameterfilter wird zunächst nicht angezeigt
+  // Der Parameterfilter wird zunächst nicht angezeigt
   showParameterFilter(false, false, false);
   // Wenn Fische von allen Angelplätzen angezeigt werden, ist die Möglichkeit,
   // neue Fische hinzuzufügen, nicht erlaubt
@@ -192,8 +191,8 @@ void AngelplatzWindow::showTable() {
   ui->tableView->setEnabled(proxyModel->rowCount());
   ui->actionNdern->setEnabled(ui->tableView->isEnabled());
   ui->actionLschen->setEnabled(ui->tableView->isEnabled());
-  // Erste Zeile auswählen, oder eine Meldung ausgeben, dass der Datensatz ist
-  // leer
+  // Erste Zeile auswählen, oder eine Meldung ausgeben,
+  // dass der Datensatz ist leer
   ui->tableView->isEnabled()
       ? ui->tableView->selectRow(0)
       : statusLabel->setText(tr("Der Datensatz ist leer."));
@@ -206,13 +205,13 @@ void AngelplatzWindow::readEntry(const QString &name) {
   if (!path.isEmpty()) {
     // Bildskalierung deaktivieren
     ui->image->setScaledContents(false);
-    // das Bild wird gesetzt, wenn ein Bildlink vorhanden ist
+    // Das Bild wird gesetzt, wenn ein Bildlink vorhanden ist
     ui->image->setPixmap(QPixmap::fromImage(QImage(path))
                              .scaled(ui->image->width(), ui->image->height(),
                                      Qt::KeepAspectRatio,
                                      Qt::SmoothTransformation));
   }
-  // der Name des Angelplatzes unter dem Bild
+  // Der Name des Angelplatzes unter dem Bild
   ui->lblAngelplatzInfo->setText(name);
 }
 
@@ -242,13 +241,13 @@ void AngelplatzWindow::deleteEntry(const QModelIndex &index) {
 
   if (msgValue == QMessageBox::Cancel)
     return;
-  // falls angelplatzName leer ist, nimmt einen neuen Wert an
+  // Falls angelplatzName leer ist, nimmt einen neuen Wert an
   QString newAngelplatzName = angelplatzName;
 
   if (angelplatzName.isEmpty())
     newAngelplatzName = FischeDAO::readFischAngelplatz(key);
 
-  // Löschen der Fisch über den Primärschlüssel
+  // Löschen den Fisch über den Primärschlüssel
   if (FischeDAO::deleteFisch(key) &&
       AngelplaetzeDAO::changeNumberFische(newAngelplatzName, -1)) {
     // Meldung, wenn sich die Daten in der Datenbank geändert haben
@@ -256,7 +255,7 @@ void AngelplatzWindow::deleteEntry(const QModelIndex &index) {
 
     statusLabel->setText(tr("Einträge werden aktualisiert..."));
     QApplication::processEvents();
-    // Fische neu in das Datenmodell einlesen
+    // Die Fische im Datenmodell erneut lesen
     showTable();
 
     int row = (index.row() - 1 < 0) ? 0 : index.row() - 1;
@@ -273,7 +272,7 @@ void AngelplatzWindow::refreshTableView(const qint64 key) {
 
   statusLabel->setText(tr("Einträge werden aktualisiert..."));
   QApplication::processEvents();
-  // falls ein neuer Wert in die Datenbank eingefügt wird
+  // Falls ein neuer Wert in die Datenbank eingefügt wird
   AngelplaetzeDAO::changeNumberFische(angelplatzName, 1);
   // Meldung, wenn sich die Daten in der Datenbank geändert haben
   emit dataModified(AngelplaetzeDAO::readAngelplatzKey(angelplatzName));
@@ -281,7 +280,7 @@ void AngelplatzWindow::refreshTableView(const qint64 key) {
   ui->cbFischarten->clear();
   ui->cbFischarten->addItems(QStringList() << tr("Fischarten")
                                            << FischeDAO::readFischarten());
-  // Fische neu in das Datenmodell einlesen
+  // Die Fische im Datenmodell erneut lesen
   showTable();
   // Den Cursor auf den neuen Eintrag über den Primärschlüssel positionieren
   findItemInTableView(Cnt::PRIMARYKEY, QVariant(key));
@@ -393,7 +392,7 @@ void AngelplatzWindow::tableView_section_resized(int index, int, int newSize) {
 }
 
 void AngelplatzWindow::tableView_selectionChanged() {
-  // anzeigen, welcher Datensatz ausgewählt ist
+  // Anzeigen, welcher Datensatz ausgewählt ist
   statusLabel->setText(
       QString(tr("Datensatz %L1 von %L2"))
           .arg(ui->tableView->selectionModel()->currentIndex().row() + 1)
@@ -482,29 +481,28 @@ void AngelplatzWindow::on_cbNacht_currentTextChanged(const QString &text) {
 
 void AngelplatzWindow::on_cbParameter_currentIndexChanged(int index) {
   // Festlegen des SpinBox-Werts nach Auswahl eines anderen Parametertyps
-  auto setMinMax = [&](int min, int max) {
+  auto setMinMax = [&](const QString &col) {
+    int min = FischeDAO::getMinParameter(col, angelplatzName).toInt();
+    int max = FischeDAO::getMaxParameter(col, angelplatzName).toInt();
+
     ui->sbMin->setRange(min, max);
     ui->sbMin->setValue(min);
     ui->sbMax->setRange(min, max);
     ui->sbMax->setValue(max);
   };
-  // je nach Wahl der ComboBox, was angezeigt werden soll
-  index == 0   ? showParameterFilter(false, false, false)
-  : index == 3 ? showParameterFilter(false, true, true)
-               : showParameterFilter(true, false, true);
   // Mindest- und Höchstwerte einstellen
   switch (index) {
   case Cnt::Parameter::P_LAENGE:
-    setMinMax(FischeDAO::getMinParameter(Cnt::LAENGE).toInt(),
-              FischeDAO::getMaxParameter(Cnt::LAENGE).toInt());
+    setMinMax(Cnt::LAENGE);
     break;
   case Cnt::Parameter::P_GEWICHT:
-    setMinMax(FischeDAO::getMinParameter(Cnt::GEWICHT).toInt(),
-              FischeDAO::getMaxParameter(Cnt::GEWICHT).toInt());
+    setMinMax(Cnt::GEWICHT);
     break;
   case Cnt::Parameter::P_ZEIT: {
-    QDateTime min = FischeDAO::getMinParameter(Cnt::ZEIT).toDateTime();
-    QDateTime max = FischeDAO::getMaxParameter(Cnt::ZEIT).toDateTime();
+    QDateTime min =
+        FischeDAO::getMinParameter(Cnt::ZEIT, angelplatzName).toDateTime();
+    QDateTime max =
+        FischeDAO::getMaxParameter(Cnt::ZEIT, angelplatzName).toDateTime();
 
     ui->dateTimeMin->setDateTimeRange(min, max);
     ui->dateTimeMin->setDateTime(min);
@@ -512,24 +510,25 @@ void AngelplatzWindow::on_cbParameter_currentIndexChanged(int index) {
     ui->dateTimeMax->setDateTime(max);
   } break;
   case Cnt::Parameter::P_TEMPERATUR:
-    setMinMax(FischeDAO::getMinParameter(Cnt::TEMPERATUR).toInt(),
-              FischeDAO::getMaxParameter(Cnt::TEMPERATUR).toInt());
+    setMinMax(Cnt::TEMPERATUR);
     break;
   case Cnt::Parameter::P_WINDGESCHWINDIGKEIT:
-    setMinMax(FischeDAO::getMinParameter(Cnt::WINDGESCHWINDIGKEIT).toInt(),
-              FischeDAO::getMaxParameter(Cnt::WINDGESCHWINDIGKEIT).toInt());
+    setMinMax(Cnt::WINDGESCHWINDIGKEIT);
     break;
   case Cnt::Parameter::P_LUFTDRUCK:
-    setMinMax(FischeDAO::getMinParameter(Cnt::LUFTDRUCK).toInt(),
-              FischeDAO::getMaxParameter(Cnt::LUFTDRUCK).toInt());
+    setMinMax(Cnt::LUFTDRUCK);
     break;
   }
-  // welcher Parametertyp zum Filtern ausgewählt wird
+  // Je nach Wahl der ComboBox, was angezeigt werden soll
+  index == 0   ? showParameterFilter(false, false, false)
+  : index == 3 ? showParameterFilter(false, true, true)
+               : showParameterFilter(true, false, true);
+  // Welcher Parametertyp zum Filtern ausgewählt wird
   filterParameter = index;
 
   showTable();
 }
-// aktualisieren Sie die Tabellenanzeige nach jeder Wertänderung
+// Aktualisieren Sie die Tabellenanzeige nach jeder Wertänderung
 void AngelplatzWindow::on_sbMin_valueChanged(int) { showTable(); }
 
 void AngelplatzWindow::on_dateTimeMin_dateTimeChanged(const QDateTime &) {

@@ -29,9 +29,9 @@ public:
 
 signals:
   // Eigene Signale
-  // ob sich die Daten in der Datenbank geändert haben
+  // Ob sich die Daten in der Datenbank geändert haben
   void dataModified(const qint64 key);
-  //ob sich die Spaltenbreite geändert hat
+  // Ob sich die Spaltenbreite geändert hat
   void columnWidthModified(const QList<int> list);
 
 private slots:
@@ -55,7 +55,7 @@ private slots:
 
 private:
   Ui::AngelplatzWindow *ui;
-  // der Name des aktuellen Angelplatzes
+  // Der Name des aktuellen Angelplatzes
   QString angelplatzName;
   QLabel *statusLabel;
   FischeSqlTableModel *model;
@@ -63,7 +63,7 @@ private:
   QString filterFischarten;
   QString filterNiederschlag;
   QString filterNacht;
-  // welcher Parametertyp zum Filtern ausgewählt wird
+  // Welcher Parametertyp zum Filtern ausgewählt wird
   int filterParameter;
   // Listenwerte Spaltenbreite
   QList<int> colAngelplatzWidthList;

@@ -24,7 +24,7 @@ public:
 
 signals:
   // Eigenes Signal
-  // ob sich die Daten in der Datenbank geändert haben
+  // Ob sich die Daten in der Datenbank geändert haben
   void dataModified(const qint64 key, const Cnt::EditMode editMode);
 
 private slots:
@@ -45,11 +45,11 @@ private slots:
 
 private:
   Ui::AngelplatzDialog *ui;
-  // der Primärschlüssel des aktuellen Angelplatzes
+  // Der Primärschlüssel des aktuellen Angelplatzes
   qint64 dlgKey;
   // Bildlink für aktuellen Angelplatz
   QString imagePath;
-  // ob sich Daten geändert haben
+  // Bb sich Daten geändert haben
   bool isModified;
   // Anzahl der Fische an diesem Angelplatz
   int fische;
@@ -66,6 +66,6 @@ private:
   // Überschriebene Methoden
   // Um das Schließne des Dialogs zu überwachen
   void closeEvent(QCloseEvent *event) override;
-  // wegen der ESC-Taste
+  // Wegen der ESC-Taste
   void reject() override;
 };

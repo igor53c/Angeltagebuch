@@ -36,7 +36,7 @@ void AngelplatzDialog::setIsModified(const bool isModified) {
 void AngelplatzDialog::readEntry(const qint64 key) {
   // Laden von Daten aus der Datenbank für den aktuellen Angelplatz
   Angelplatz *angelplatz = AngelplaetzeDAO::readAngelplatz(key);
-  // wenn das Laden der Daten fehlgeschlagen ist
+  // Wenn das Laden der Daten fehlgeschlagen ist
   if (angelplatz == nullptr)
     return;
   // Speichern des Bildlinks in einer globalen Variablen
@@ -67,7 +67,7 @@ void AngelplatzDialog::readEntry(const qint64 key) {
 bool AngelplatzDialog::saveEntry() {
 
   bool retValue = false;
-  // wenn die eingegebenen Daten nicht gültig sind
+  // Wenn die eingegebenen Daten nicht gültig sind
   if (!entryIsValid())
     return retValue;
   // Lambda-Funktion für update und new
@@ -153,6 +153,7 @@ bool AngelplatzDialog::updateEntry(const qint64 key) {
 }
 
 bool AngelplatzDialog::insertEntry() {
+
   return AngelplaetzeDAO::insertAngelplatz(
       imagePath, ui->textName->text(), ui->textType->text(), fische,
       ui->textPlz->text(), ui->textOrt->text(), ui->textLand->text(),
@@ -167,20 +168,27 @@ void AngelplatzDialog::importImage() {
   QString newImagePath = QFileDialog::getOpenFileName(
       this, tr("Bild hochladen"), QDir::currentPath(),
       tr("Alle Dateien (*.*);;") + defaultFilter, &defaultFilter);
-  // ob ein Bild ausgewählt ist
+  // Ob ein Bild ausgewählt ist
   if (newImagePath.isEmpty())
     return;
   // Speichern des Bildlinks in einer globalen Variablen
   imagePath = newImagePath;
   // Bildskalierung deaktivieren
   ui->image->setScaledContents(false);
-  // das Bild wird gesetzt, wenn ein Bildlink vorhanden ist
+  // Das Bild wird gesetzt, wenn ein Bildlink vorhanden ist
   ui->image->setPixmap(QPixmap::fromImage(QImage(imagePath))
                            .scaled(ui->image->width(), ui->image->height(),
                                    Qt::KeepAspectRatio,
                                    Qt::SmoothTransformation));
 }
 
+void AngelplatzDialog::closeEvent(QCloseEvent *event) {
+    // Prüfen vor dem Beenden, ob die eingegebenen Daten gespeichert werden sollen
+    querySave() ? event->accept() : event->ignore();
+}
+
+void AngelplatzDialog::reject() { close(); }
+// Bei jeder Wertänderung ist isModified = true
 void AngelplatzDialog::on_btnBildHochladen_clicked() {
 
   setIsModified(true);
@@ -224,13 +232,6 @@ void AngelplatzDialog::on_textLand_textChanged(const QString &) {
 }
 
 void AngelplatzDialog::on_textInfo_textChanged() { setIsModified(true); }
-
-void AngelplatzDialog::closeEvent(QCloseEvent *event) {
-  // Prüfen vor dem Beenden, ob die eingegebenen Daten gespeichert werden sollen
-  querySave() ? event->accept() : event->ignore();
-}
-
-void AngelplatzDialog::reject() { close(); }
 // Nach Drücken der Enter-Taste wird automatisch zum nächsten Feld gewechselt
 void AngelplatzDialog::on_textName_returnPressed() { this->focusNextChild(); }
 

@@ -22,7 +22,7 @@ bool SortFilterProxyModel::filteringByAngelplatz(
 
   if (angelplatz.isEmpty())
     return true;
-
+  // Vergleichen, ob der Wert in DATA gleich dem angegebenen Filterwert ist
   return sourceModel()
              ->data(sourceModel()->index(source_row, angelplatzColumn,
                                          source_parent))
@@ -34,7 +34,7 @@ bool SortFilterProxyModel::filteringByName(
 
   if (name.isEmpty())
     return true;
-
+  // Vergleichen, ob der Wert in DATA gleich dem angegebenen Filterwert ist
   return sourceModel()
              ->data(sourceModel()->index(source_row, nameColumn, source_parent))
              .toString() == name;
@@ -45,7 +45,7 @@ bool SortFilterProxyModel::filteringByNiederschlag(
 
   if (niederschlag.isEmpty())
     return true;
-
+  // Vergleichen, ob der Wert in DATA gleich dem angegebenen Filterwert ist
   return sourceModel()
              ->data(sourceModel()->index(source_row, niederschlagColumn,
                                          source_parent))
@@ -57,7 +57,7 @@ bool SortFilterProxyModel::filteringByNacht(
 
   if (nacht.isEmpty())
     return true;
-
+  // Vergleichen, ob der Wert in DATA gleich dem angegebenen Filterwert ist
   return sourceModel()
              ->data(
                  sourceModel()->index(source_row, nachtColumn, source_parent))
@@ -72,7 +72,9 @@ bool SortFilterProxyModel::filteringByParameter(
 
   QVariant data = sourceModel()->data(
       sourceModel()->index(source_row, parameterColumn, source_parent));
-
+  // Vergleichen, ob der Wert in DATA gleich dem angegebenen Filterwert ist.
+  // Falls es sich um einen Zeitfilterparameter handelt,
+  // wird der DATA-Wert in DateTime umgewandelt
   return parameter == Cnt::Parameter::P_ZEIT
              ? data.toDateTime() >= zeitMin && data.toDateTime() <= zeitMax
              : data.toInt() >= parameterMin && data.toInt() <= parameterMax;
