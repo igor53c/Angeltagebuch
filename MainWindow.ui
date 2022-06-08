@@ -45,16 +45,7 @@
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">QHeaderView::section{
-           border-top:0px solid #D8D8D8;
-            border-left:0px solid #D8D8D8;
-            border-right:1px solid #D8D8D8;
-            border-bottom: 1px solid #D8D8D8;
-            background-color:white;
-            padding:4px;
-            font: bold 18px;
-        }
-</string>
+       <string notr="true"/>
       </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
@@ -144,7 +135,23 @@
      <addaction name="actionDeutsch"/>
      <addaction name="actionEnglisch"/>
     </widget>
+    <widget class="QMenu" name="menuHintergrund">
+     <property name="title">
+      <string>&amp;Hintergrund</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Angeltagebuch.qrc">
+       <normaloff>:/hintergrund.png</normaloff>:/hintergrund.png</iconset>
+     </property>
+     <addaction name="actionWeiss"/>
+     <addaction name="actionGelb"/>
+     <addaction name="actionGraU"/>
+     <addaction name="actionGRn"/>
+     <addaction name="actionRot"/>
+     <addaction name="actionBlau"/>
+    </widget>
     <addaction name="menuSprache"/>
+    <addaction name="menuHintergrund"/>
    </widget>
    <addaction name="menuAngelplatz"/>
    <addaction name="menuBearbeiten"/>
@@ -271,6 +278,57 @@
    </property>
    <property name="text">
     <string>&amp;Englisch</string>
+   </property>
+  </action>
+  <action name="actionWeiss">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Weiss</string>
+   </property>
+  </action>
+  <action name="actionGelb">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Gelb</string>
+   </property>
+  </action>
+  <action name="actionGraU">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Gra&amp;u</string>
+   </property>
+  </action>
+  <action name="actionGRn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Grü&amp;n</string>
+   </property>
+  </action>
+  <action name="actionRot">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Rot</string>
+   </property>
+  </action>
+  <action name="actionBlau">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Blau</string>
    </property>
   </action>
  </widget>

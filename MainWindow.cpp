@@ -33,6 +33,13 @@ void MainWindow::init() {
   QActionGroup *actionGroupLanguage = new QActionGroup(this);
   actionGroupLanguage->addAction(ui->actionDeutsch);
   actionGroupLanguage->addAction(ui->actionEnglisch);
+  QActionGroup *actionGroupColor = new QActionGroup(this);
+  actionGroupColor->addAction(ui->actionWeiss);
+  actionGroupColor->addAction(ui->actionGelb);
+  actionGroupColor->addAction(ui->actionGraU);
+  actionGroupColor->addAction(ui->actionGRn);
+  actionGroupColor->addAction(ui->actionRot);
+  actionGroupColor->addAction(ui->actionBlau);
   // Übersetzer für Systemtexte erstellen
   sysTranslator = new QTranslator(this);
   sysTranslatorInstalled = false;
@@ -66,14 +73,50 @@ void MainWindow::init() {
   readXMLSettings(xmlConfigFile);
   // Den Event Filter für die tableView installieren
   ui->tableView->installEventFilter(this);
+
+  setBackgroundColor();
+  // Anzeige aller Datensätze aus der Tabelle der Angelplätze
+  showTable();
+}
+
+void MainWindow::setBackgroundColor() {
   // Ändert die Text- und Hintergrundfarbe der selektierten Zeile der TableView
   // damit die Markierung beim Fokusverlust sichtbar bleibt.
   QPalette palette = ui->tableView->palette();
   palette.setColor(QPalette::HighlightedText, Qt::white);
   palette.setColor(QPalette::Highlight, Cnt::COLOR_HIGHLIGHT);
+  // Stellen die Farbe des leeren Teils der Tabelle ein
+  palette.setColor(QPalette::Base, DAOLib::colorBackground());
   ui->tableView->setPalette(palette);
-  // Anzeige aller Datensätze aus der Tabelle der Postleitzahlen
-  showTable();
+  // Stellen den Stil der Tabelle ein
+  ui->tableView->setStyleSheet("QHeaderView::section{"
+                               "border-top:0px solid #D8D8D8;"
+                               "border-left:0px solid #D8D8D8;"
+                               "border-right:1px solid #D8D8D8;"
+                               "border-bottom: 1px solid #D8D8D8;"
+                               "padding:4px;"
+                               "font: bold 18px;"
+                               "background-color: " +
+                               DAOLib::colorBackground().name() +
+                               ";}"
+                               "QTableView{ border : 1px solid #D8D8D8; }");
+  // Hintergrundfarbe ändern für das Fenster
+  palette = this->palette();
+  palette.setColor(QPalette::Window, DAOLib::colorBackground());
+  this->setPalette(palette);
+
+  auto changeBacgroundColor = [&](QMenu *menu) {
+    palette = menu->palette();
+    palette.setColor(menu->backgroundRole(), DAOLib::colorBackground());
+    menu->setPalette(palette);
+  };
+  // Hintergrundfarbe ändern für Menu
+  changeBacgroundColor(ui->menuAngelplatz);
+  changeBacgroundColor(ui->menuBearbeiten);
+  changeBacgroundColor(ui->menuDaten);
+  changeBacgroundColor(ui->menuExtras);
+  changeBacgroundColor(ui->menuSprache);
+  changeBacgroundColor(ui->menuHintergrund);
 }
 
 void MainWindow::setTableViewModel() {
@@ -127,9 +170,6 @@ void MainWindow::showTable() {
   // Anpassen der Spaltenbreiten der vorherigen Einstellung des Benutzers
   for (int i = 0; i < mainColWidthList.size(); i++)
     ui->tableView->setColumnWidth(i, mainColWidthList[i]);
-  // Alle Spaltenüberschriften linksbündig
-  ui->tableView->horizontalHeader()->setDefaultAlignment(
-      Qt::AlignmentFlag::AlignLeft | Qt::AlignmentFlag::AlignVCenter);
   // Spalte PRIMARYKEY unsichtbar machen
   ui->tableView->hideColumn(model->record().indexOf(Cnt::PRIMARYKEY));
   // Aktivieren/Deaktivieren der Komponenten, abhängig davon,
@@ -351,6 +391,32 @@ void MainWindow::loadLanguage(const QString &language) {
     sysTranslatorInstalled = QApplication::installTranslator(sysTranslator);
 }
 
+void MainWindow::loadBackgroundColor(const int color) {
+
+  DAOLib::setColor(color);
+
+  switch (color) {
+  case Cnt::Color::WHITE:
+    ui->actionWeiss->setChecked(true);
+    break;
+  case Cnt::Color::YELLOW:
+    ui->actionGelb->setChecked(true);
+    break;
+  case Cnt::Color::GRAY:
+    ui->actionGraU->setChecked(true);
+    break;
+  case Cnt::Color::GREEN:
+    ui->actionGRn->setChecked(true);
+    break;
+  case Cnt::Color::RED:
+    ui->actionRot->setChecked(true);
+    break;
+  case Cnt::Color::BLUE:
+    ui->actionBlau->setChecked(true);
+    break;
+  }
+}
+
 void MainWindow::removeAllTranslators() {
 
   if (enTranslatorInstalled) {
@@ -369,6 +435,8 @@ void MainWindow::removeAllTranslators() {
 void MainWindow::readXMLSettings(const QString &filename) {
 
   QString language;
+
+  int colorBackground = 0;
   // Datei öffnen
   QFile file(filename);
 
@@ -399,6 +467,9 @@ void MainWindow::readXMLSettings(const QString &filename) {
             if (xmlReader.name() == QString(Cnt::COL_ANGELPLATZ).arg(i))
               angelplatzColWidthList[i] = xmlReader.readElementText().toInt();
 
+          if (xmlReader.name() == QString(Cnt::BACKGROUND))
+            colorBackground = xmlReader.readElementText().toInt();
+
         } while (!xmlReader.atEnd());
       }
     }
@@ -407,6 +478,8 @@ void MainWindow::readXMLSettings(const QString &filename) {
   file.close();
 
   loadLanguage(language);
+
+  loadBackgroundColor(colorBackground);
 }
 
 void MainWindow::writeXMLSettings(const QString &filename) {
@@ -451,6 +524,9 @@ void MainWindow::writeXMLSettings(const QString &filename) {
   for (int i = 0; i < angelplatzColWidthList.size(); i++)
     xmlWriter.writeTextElement(QString(Cnt::COL_ANGELPLATZ).arg(i),
                                QString::number(angelplatzColWidthList[i]));
+  // Schreiben die ausgewählte Hintergrundfarbe
+  xmlWriter.writeTextElement(Cnt::BACKGROUND,
+                             QString::number(DAOLib::getColor()));
   // Beendet den Knoten </Settings>
   xmlWriter.writeEndElement();
 
@@ -555,4 +631,46 @@ void MainWindow::on_actionEnglisch_triggered() {
   loadLanguage(Cnt::EN);
 
   showTable();
+}
+
+void MainWindow::on_actionWeiss_triggered() {
+
+  loadBackgroundColor(Cnt::Color::WHITE);
+
+  setBackgroundColor();
+}
+
+void MainWindow::on_actionGelb_triggered() {
+
+  loadBackgroundColor(Cnt::Color::YELLOW);
+
+  setBackgroundColor();
+}
+
+void MainWindow::on_actionGraU_triggered() {
+
+  loadBackgroundColor(Cnt::Color::GRAY);
+
+  setBackgroundColor();
+}
+
+void MainWindow::on_actionGRn_triggered() {
+
+  loadBackgroundColor(Cnt::Color::GREEN);
+
+  setBackgroundColor();
+}
+
+void MainWindow::on_actionRot_triggered() {
+
+  loadBackgroundColor(Cnt::Color::RED);
+
+  setBackgroundColor();
+}
+
+void MainWindow::on_actionBlau_triggered() {
+
+  loadBackgroundColor(Cnt::Color::BLUE);
+
+  setBackgroundColor();
 }

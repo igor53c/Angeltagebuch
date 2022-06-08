@@ -24,6 +24,10 @@ void AngelplatzDialog::init() {
   setIsModified(false);
   // Fokuseinstellung
   ui->textName->setFocus();
+  // Hintergrundfarbe ändern
+  QPalette palette = this->palette();
+  palette.setColor(QPalette::Window, DAOLib::colorBackground());
+  this->setPalette(palette);
 }
 
 void AngelplatzDialog::setIsModified(const bool isModified) {

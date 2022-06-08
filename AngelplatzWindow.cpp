@@ -36,7 +36,34 @@ void AngelplatzWindow::init() {
   QPalette palette = ui->tableView->palette();
   palette.setColor(QPalette::HighlightedText, Qt::white);
   palette.setColor(QPalette::Highlight, Cnt::COLOR_HIGHLIGHT);
+  // Stellen die Farbe des leeren Teils der Tabelle ein
+  palette.setColor(QPalette::Base, DAOLib::colorBackground());
   ui->tableView->setPalette(palette);
+  // Stellen den Stil der Tabelle ein
+  ui->tableView->setStyleSheet("QHeaderView::section{"
+                               "border-top:0px solid #D8D8D8;"
+                               "border-left:0px solid #D8D8D8;"
+                               "border-right:1px solid #D8D8D8;"
+                               "border-bottom: 1px solid #D8D8D8;"
+                               "padding:4px;"
+                               "font: bold 14px;"
+                               "background-color: " +
+                               DAOLib::colorBackground().name() +
+                               ";}"
+                               "QTableView{ border : 1px solid #D8D8D8; }");
+  // Hintergrundfarbe ändern für das Fenster
+  palette = this->palette();
+  palette.setColor(QPalette::Window, DAOLib::colorBackground());
+  this->setPalette(palette);
+
+  auto changeBacgroundColor = [&](QMenu *menu) {
+    palette = menu->palette();
+    palette.setColor(menu->backgroundRole(), DAOLib::colorBackground());
+    menu->setPalette(palette);
+  };
+  // Hintergrundfarbe ändern für Menu
+  changeBacgroundColor(ui->menuBearbeiten);
+  changeBacgroundColor(ui->menuDatei);
   // Initialisierung globaler Variablen
   listNacht = QStringList() << tr("Ja") << tr("Nein");
 
@@ -181,9 +208,6 @@ void AngelplatzWindow::showTable() {
   // Anpassen der Spaltenbreiten der vorherigen Einstellung des Benutzers
   for (int i = 0; i < colAngelplatzWidthList.size(); i++)
     ui->tableView->setColumnWidth(i, colAngelplatzWidthList[i]);
-  // Alle Spaltenüberschriften linksbündig
-  ui->tableView->horizontalHeader()->setDefaultAlignment(
-      Qt::AlignmentFlag::AlignLeft | Qt::AlignmentFlag::AlignVCenter);
   // Spalte PRIMARYKEY unsichtbar machen
   ui->tableView->hideColumn(model->record().indexOf(Cnt::PRIMARYKEY));
   // Aktivieren/Deaktivieren der Komponenten, abhängig davon,

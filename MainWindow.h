@@ -7,7 +7,6 @@
 #include <QMainWindow>
 #include <QPalette>
 #include <QSqlRecord>
-#include <QSqlTableModel>
 #include <QTranslator>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -19,6 +18,8 @@
 #include "DAOLib.h"
 #include "FischeDAO.h"
 #include "ImageStyleItemDelegate.h"
+#include "AngelplatzSqlTableModel.h"
+#include "DAOLib.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -50,12 +51,24 @@ private slots:
   // Einstellen des Spaltenbreitenwerts, gesendetes Signal von AngelplatzWindow
   void setColumnAngelplatzWidth(const QList<int> list);
 
-private:
+  void on_actionWeiss_triggered();
+
+  void on_actionGelb_triggered();
+
+  void on_actionGraU_triggered();
+
+  void on_actionGRn_triggered();
+
+  void on_actionRot_triggered();
+
+  void on_actionBlau_triggered();
+
+  private:
   Ui::MainWindow *ui;
   QLabel *statusLabel;
   AngelplatzDialog *angelplatzDialog;
   AngelplatzWindow *angelplatzWindow;
-  QSqlTableModel *model;
+  AngelplatzSqlTableModel *model;
   QTranslator *sysTranslator;
   bool sysTranslatorInstalled;
   QTranslator *enTranslator;
@@ -66,6 +79,7 @@ private:
   QList<int> angelplatzColWidthList;
 
   void init();
+  void setBackgroundColor();
   void setTableViewModel();
   void showTable();
   void showAngelplatzDialog(const qint64 key);
@@ -77,6 +91,7 @@ private:
   // Aktualisiert die TableView nach einer Datensatzänderung
   void updateTableView(const qint64 key);
   void loadLanguage(const QString &language);
+  void loadBackgroundColor(const int color);
   void removeAllTranslators();
   void readXMLSettings(const QString &filename);
   void writeXMLSettings(const QString &filename);

@@ -38,6 +38,10 @@ void FischDialog::init() {
   setIsModified(false);
   // Fokuseinstellung
   ui->cbFischarten->setFocus();
+  // Hintergrundfarbe ändern
+  QPalette palette = this->palette();
+  palette.setColor(QPalette::Window, DAOLib::colorBackground());
+  this->setPalette(palette);
 }
 
 void FischDialog::setIsModified(const bool isModified) {

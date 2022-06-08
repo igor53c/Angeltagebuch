@@ -10,6 +10,7 @@
 #include "AngelplaetzeDAO.h"
 #include "Constants.h"
 #include "FischeDAO.h"
+#include "DAOLib.h"
 
 namespace Ui {
 class AngelplatzDialog;

@@ -7,6 +7,8 @@
 #include <QPixmap>
 #include <QStyledItemDelegate>
 
+#include "Constants.h"
+#include "DAOLib.h"
 // Eigene Bildanzeigeklasse
 // Muss von QStyledItemDelegate abgeleitet werden
 class ImageStyleItemDelegate : public QStyledItemDelegate {

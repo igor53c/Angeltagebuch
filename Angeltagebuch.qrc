@@ -10,5 +10,6 @@
         <file>beenden.png</file>
         <file>appIcon.png</file>
         <file>aendern.png</file>
+        <file>hintergrund.png</file>
     </qresource>
 </RCC>

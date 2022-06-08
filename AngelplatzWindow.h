@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <QMainWindow>
 #include <QSqlRecord>
-#include <QSqlTableModel>
 
 #include "AngelplaetzeDAO.h"
 #include "Angelplatz.h"
@@ -14,6 +13,7 @@
 #include "FischeSqlTableModel.h"
 #include "ImageStyleItemDelegate.h"
 #include "SortFilterProxyModel.h"
+#include "DAOLib.h"
 
 namespace Ui {
 class AngelplatzWindow;

@@ -7,7 +7,7 @@ void ImageStyleItemDelegate::paint(QPainter *painter,
                                    const QStyleOptionViewItem &option,
                                    const QModelIndex &index) const {
   // Um eine Hintergrundfarbe für das Bild zu setzen
-  painter->fillRect(option.rect, Qt::white);
+  painter->fillRect(option.rect, DAOLib::colorBackground());
   // Namen der Bilddatei über den Index lesen
   QString imageFile = index.data().toString();
   // Überprüfen, ob der Bildlink geladen ist
