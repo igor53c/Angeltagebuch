@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QCloseEvent>
-#include <QDebug>
 #include <QDialog>
 #include <QDir>
 #include <QFileDialog>

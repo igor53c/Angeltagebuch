@@ -61,6 +61,7 @@ void MainWindow::init() {
   actionGroupLanguage->addAction(ui->actionDeutsch);
   actionGroupLanguage->addAction(ui->actionEnglisch);
   actionGroupLanguage->addAction(ui->actionSerBisch);
+
   QActionGroup *actionGroupColor = new QActionGroup(this);
   actionGroupColor->addAction(ui->actionWeiss);
   actionGroupColor->addAction(ui->actionGelb);
@@ -499,6 +500,11 @@ void MainWindow::removeAllTranslators() {
     enTranslatorInstalled = false;
   }
 
+  if (srbTranslatorInstalled) {
+    QApplication::removeTranslator(srbTranslator);
+    srbTranslatorInstalled = false;
+  }
+
   QApplication::removeTranslator(sysTranslator);
   sysTranslatorInstalled = false;
 
@@ -671,7 +677,7 @@ void MainWindow::on_action_Suchen_triggered() {
   cancelButton->setVisible(true);
 
   textSuchen->setVisible(true);
-
+  // Fokuseinstellung
   textSuchen->setFocus();
 }
 

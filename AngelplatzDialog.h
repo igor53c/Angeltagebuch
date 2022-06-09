@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <QCloseEvent>
-#include <QDebug>
 #include <QDialog>
 #include <QDir>
 #include <QFileDialog>
@@ -50,7 +49,7 @@ private:
   qint64 dlgKey;
   // Bildlink für aktuellen Angelplatz
   QString imagePath;
-  // Bb sich Daten geändert haben
+  // Ob sich Daten geändert haben
   bool isModified;
   // Anzahl der Fische an diesem Angelplatz
   int fische;

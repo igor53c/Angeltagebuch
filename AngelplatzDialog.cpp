@@ -153,7 +153,10 @@ bool AngelplatzDialog::updateEntry(const qint64 key) {
              ui->textPlz->text(), ui->textOrt->text(), ui->textLand->text(),
              ui->textInfo->toPlainText()) &&
          // Update und Fischdaten mit dem Namen des Angelplatzes
-         FischeDAO::updateFischeWithAngelplatz(oldName, ui->textName->text());
+         // ob es an diesem Angelplatz Fische gibt
+         (fische > 0 ? FischeDAO::updateFischeWithAngelplatz(
+                           oldName, ui->textName->text())
+                     : true);
 }
 
 bool AngelplatzDialog::insertEntry() {

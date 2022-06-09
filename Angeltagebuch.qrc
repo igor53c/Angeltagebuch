@@ -7,10 +7,10 @@
         <file>loeschen.png</file>
         <file>languageIcon.png</file>
         <file>imageIcon.png</file>
-        <file>beenden.png</file>
         <file>appIcon.png</file>
         <file>aendern.png</file>
         <file>hintergrund.png</file>
         <file>suchen.png</file>
+        <file>beenden.png</file>
     </qresource>
 </RCC>

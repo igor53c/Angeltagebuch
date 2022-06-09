@@ -1,29 +1,27 @@
 #pragma once
 
 #include <QActionGroup>
-#include <QDebug>
 #include <QLabel>
 #include <QLibraryInfo>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <QPalette>
+#include <QPushButton>
 #include <QSqlRecord>
 #include <QTranslator>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
-#include <QLineEdit>
-#include <QPushButton>
 
 #include "AngelplaetzeDAO.h"
 #include "AngelplatzDialog.h"
+#include "AngelplatzSqlTableModel.h"
 #include "AngelplatzWindow.h"
 #include "Constants.h"
 #include "DAOLib.h"
 #include "FischeDAO.h"
 #include "ImageStyleItemDelegate.h"
-#include "AngelplatzSqlTableModel.h"
-#include "StyleBackground.h"
-#include "DAOLib.h"
 #include "SearchProxyModel.h"
+#include "StyleBackground.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -65,7 +63,7 @@ private slots:
   void onSearch_cancel();
   void onTextSuchen_textChanged(const QString &);
 
-  private:
+private:
   Ui::MainWindow *ui;
   QLabel *statusLabel;
   AngelplatzDialog *angelplatzDialog;
