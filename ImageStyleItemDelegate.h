@@ -8,7 +8,7 @@
 #include <QStyledItemDelegate>
 
 #include "Constants.h"
-#include "DAOLib.h"
+#include "StyleBackground.h"
 // Eigene Bildanzeigeklasse
 // Muss von QStyledItemDelegate abgeleitet werden
 class ImageStyleItemDelegate : public QStyledItemDelegate {

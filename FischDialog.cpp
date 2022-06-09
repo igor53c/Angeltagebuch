@@ -40,7 +40,7 @@ void FischDialog::init() {
   ui->cbFischarten->setFocus();
   // Hintergrundfarbe ändern
   QPalette palette = this->palette();
-  palette.setColor(QPalette::Window, DAOLib::colorBackground());
+  palette.setColor(QPalette::Window, StyleBackground::colorBackground());
   this->setPalette(palette);
 }
 

@@ -31,34 +31,36 @@ void AngelplatzWindow::init() {
   statusBar()->addWidget(statusLabel, 1);
   // Den Event Filter für die tableView installieren
   ui->tableView->installEventFilter(this);
-  // Ändert die Text- und Hintergrundfarbe der selektierten Zeile der TableView
-  // damit die Markierung beim Fokusverlust sichtbar bleibt.
-  QPalette palette = ui->tableView->palette();
-  palette.setColor(QPalette::HighlightedText, Qt::white);
-  palette.setColor(QPalette::Highlight, Cnt::COLOR_HIGHLIGHT);
-  // Stellen die Farbe des leeren Teils der Tabelle ein
-  palette.setColor(QPalette::Base, DAOLib::colorBackground());
-  ui->tableView->setPalette(palette);
   // Stellen den Stil der Tabelle ein
-  ui->tableView->setStyleSheet("QHeaderView::section{"
-                               "border-top:0px solid #D8D8D8;"
-                               "border-left:0px solid #D8D8D8;"
-                               "border-right:1px solid #D8D8D8;"
-                               "border-bottom: 1px solid #D8D8D8;"
-                               "padding:4px;"
-                               "font: bold 14px;"
-                               "background-color: " +
-                               DAOLib::colorBackground().name() +
-                               ";}"
-                               "QTableView{ border : 1px solid #D8D8D8; }");
+  ui->tableView->setStyleSheet(
+      "QHeaderView::section{"
+      "border-top: 0px solid #D8D8D8;"
+      "border-left: 0px solid #D8D8D8;"
+      "border-right: 1px solid #D8D8D8;"
+      "border-bottom: 1px solid #D8D8D8;"
+      "padding: 4px;"
+      "font: bold 14px;"
+      "background-color: " +
+      StyleBackground::colorBackground().name() +
+      ";}"
+      "QTableView{ "
+      "border : 1px solid #D8D8D8;" +
+      // Stellen die Farbe des leeren Teils der Tabelle ein
+      "background : " + StyleBackground::colorBackground().name() +
+      ";selection-background-color: " +
+      // Ändert die Text- und Hintergrundfarbe der selektierten Zeile der
+      // TableView damit die Markierung beim Fokusverlust sichtbar bleibt.
+      Cnt::COLOR_HIGHLIGHT[StyleBackground::getColorIndex()].name() +
+      ";selection-color: " + Cnt::COLOR_WHITE.name() + ";};");
   // Hintergrundfarbe ändern für das Fenster
-  palette = this->palette();
-  palette.setColor(QPalette::Window, DAOLib::colorBackground());
+  QPalette palette = this->palette();
+  palette.setColor(QPalette::Window, StyleBackground::colorBackground());
   this->setPalette(palette);
 
   auto changeBacgroundColor = [&](QMenu *menu) {
     palette = menu->palette();
-    palette.setColor(menu->backgroundRole(), DAOLib::colorBackground());
+    palette.setColor(menu->backgroundRole(),
+                     StyleBackground::colorBackground());
     menu->setPalette(palette);
   };
   // Hintergrundfarbe ändern für Menu
@@ -348,9 +350,7 @@ void AngelplatzWindow::updateTableView(const qint64 key) {
   if (fisch == nullptr)
     return;
 
-  QModelIndex currentIndex = ui->tableView->currentIndex();
-
-  auto sourceIndex = proxyModel->mapToSource(currentIndex);
+  auto sourceIndex = proxyModel->mapToSource(ui->tableView->currentIndex());
 
   QModelIndex index;
 

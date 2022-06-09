@@ -13,6 +13,7 @@ SOURCES += \
     AngelplatzWindow.cpp \
     FischDialog.cpp \
     ImageStyleItemDelegate.cpp \
+    SearchProxyModel.cpp \
     SortFilterProxyModel.cpp \
     main.cpp \
     MainWindow.cpp
@@ -23,6 +24,7 @@ HEADERS += \
     FischDialog.h \
     ImageStyleItemDelegate.h \
     MainWindow.h \
+    SearchProxyModel.h \
     SortFilterProxyModel.h
 
 FORMS += \
@@ -35,10 +37,12 @@ RESOURCES += \
     Angeltagebuch.qrc
 
 TRANSLATIONS += \
-    Angeltagebuch_en.ts
+    Angeltagebuch_en.ts \
+    Angeltagebuch_hr.ts
 
 DISTFILES += \
-    Angeltagebuch_en.ts
+    Angeltagebuch_en.ts \
+    Angeltagebuch_hr.ts
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

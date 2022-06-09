@@ -13,7 +13,7 @@
 #include "FischeSqlTableModel.h"
 #include "ImageStyleItemDelegate.h"
 #include "SortFilterProxyModel.h"
-#include "DAOLib.h"
+#include "StyleBackground.h"
 
 namespace Ui {
 class AngelplatzWindow;

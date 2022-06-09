@@ -18,13 +18,40 @@ void MainWindow::init() {
   angelplatzDialog = nullptr;
   angelplatzWindow = nullptr;
   model = nullptr;
-  // Einen Label für die ANzeige von Meldungen in der Statusbar erzeugen
+  proxyModel = nullptr;
+  // Abbruch-Button zum Abbrechen der Suche
+  cancelButton = new QPushButton(this);
+  cancelButton->setFixedSize(QSize(30, 30));
+  cancelButton->setIcon(QIcon(":/beenden.png"));
+  cancelButton->setIconSize(QSize(15, 15));
+  cancelButton->setToolTip(tr("Die Suche abbrechen"));
+  // Signal 'clicked' mit eigenen Slot 'onSearch_cancel' verbinden
+  connect(cancelButton, &QPushButton::clicked, this,
+          &MainWindow::onSearch_cancel);
+  // Initial unsichtbar
+  cancelButton->setVisible(false);
+
+  statusBar()->addWidget(cancelButton);
+  // Erstellen einen Texteintrag in der Statusbar
+  textSuchen = new QLineEdit(this);
+  // Abmessungen der Texteintrag anpassen
+  textSuchen->setFixedSize(QSize(200, 30));
+  // Signal 'textChanged' mit eigenen Slot 'onTextSuchen_textChanged' verbinden
+  connect(textSuchen, &QLineEdit::textChanged, this,
+          &MainWindow::onTextSuchen_textChanged);
+  // Initial unsichtbar
+  textSuchen->setVisible(false);
+  // Der 2. Parameter stretch = 1 dehnt den Label
+  // über die gesamte StatusBar aus.
+  statusBar()->addWidget(textSuchen, 1);
+  // Einen Label für die Anzeige von Meldungen in der Statusbar erzeugen
   statusLabel = new QLabel(this);
   // Den Text horizontal und vertikal in der Mitte ausrichten
   statusLabel->setAlignment(Qt::AlignCenter);
-  // Der 2. Parameter stretch = 1 dehnt den Label
-  // über die gesamte StatusBar aus.
-  statusBar()->addWidget(statusLabel, 1);
+  // Positioniert statusLabel rechts in der Statusbar
+  statusBar()->addPermanentWidget(statusLabel);
+  // QMargins(left, top, right, bottom)
+  statusBar()->setContentsMargins(QMargins(10, 0, 10, 10));
   // Menüeinträge als RadioButtons
   // Die Menüeinträge zur Sprachauswahl sind checkable.
   // Damit immer nur ein Eintrag ausgewählt werden kann
@@ -33,6 +60,7 @@ void MainWindow::init() {
   QActionGroup *actionGroupLanguage = new QActionGroup(this);
   actionGroupLanguage->addAction(ui->actionDeutsch);
   actionGroupLanguage->addAction(ui->actionEnglisch);
+  actionGroupLanguage->addAction(ui->actionSerBisch);
   QActionGroup *actionGroupColor = new QActionGroup(this);
   actionGroupColor->addAction(ui->actionWeiss);
   actionGroupColor->addAction(ui->actionGelb);
@@ -46,23 +74,33 @@ void MainWindow::init() {
   // Übersetzer für Englisch erstellen
   enTranslator = new QTranslator(this);
   enTranslatorInstalled = false;
+  // Übersetzer für Serbisch erstellen
+  srbTranslator = new QTranslator(this);
+  srbTranslatorInstalled = false;
   // Übersetzungsdatei für Englisch aus dem Anwendungsverzeichnis laden
-  bool enLoaded = enTranslator->load(
-      QLocale::English, QDir::currentPath() + QDir::separator() + Cnt::APP_NAME,
-      Cnt::SUFFIX);
-
-  if (!enLoaded) {
+  if (!enTranslator->load(QLocale::English,
+                          QDir::currentPath() + QDir::separator() +
+                              Cnt::APP_NAME,
+                          Cnt::SUFFIX)) {
     delete enTranslator;
     enTranslator = nullptr;
+  }
+  // Übersetzungsdatei für Serbisch aus dem Anwendungsverzeichnis laden
+  if (!srbTranslator->load(QLocale::Croatian,
+                           QDir::currentPath() + QDir::separator() +
+                               Cnt::APP_NAME,
+                           Cnt::SUFFIX)) {
+    delete srbTranslator;
+    srbTranslator = nullptr;
   }
   // Datenbank öffnen
   DAOLib::connectToDatabase(Cnt::DRIVER, Cnt::DRIVER_NAME, Cnt::SERVER,
                             Cnt::DATABASE_NAME);
   // Setzen von Standardwerten für Spaltenbreiten
-  for (int i = 0; i < AngelplaetzeDAO::countColumns(); i++)
+  for (int i = 0; i <= Cnt::Angelplaetze::A_INFO; i++)
     mainColWidthList.push_back(Cnt::MAIN_COL_WIDTH);
 
-  for (int i = 0; i < FischeDAO::countColumns(); i++)
+  for (int i = 0; i <= Cnt::Fische::F_INFO; i++)
     angelplatzColWidthList.push_back(Cnt::ANGELPLATZ_COL_WIDTH);
   // Zuletzt verwendete Sprache aus der XML-Datei lesen
   QString xmlConfigFilePath =
@@ -74,40 +112,41 @@ void MainWindow::init() {
   // Den Event Filter für die tableView installieren
   ui->tableView->installEventFilter(this);
 
-  setBackgroundColor();
+  setBackgroundColor(StyleBackground::getColorIndex());
   // Anzeige aller Datensätze aus der Tabelle der Angelplätze
   showTable();
 }
 
-void MainWindow::setBackgroundColor() {
-  // Ändert die Text- und Hintergrundfarbe der selektierten Zeile der TableView
-  // damit die Markierung beim Fokusverlust sichtbar bleibt.
-  QPalette palette = ui->tableView->palette();
-  palette.setColor(QPalette::HighlightedText, Qt::white);
-  palette.setColor(QPalette::Highlight, Cnt::COLOR_HIGHLIGHT);
-  // Stellen die Farbe des leeren Teils der Tabelle ein
-  palette.setColor(QPalette::Base, DAOLib::colorBackground());
-  ui->tableView->setPalette(palette);
+void MainWindow::setBackgroundColor(const int colorIndex) {
   // Stellen den Stil der Tabelle ein
-  ui->tableView->setStyleSheet("QHeaderView::section{"
-                               "border-top:0px solid #D8D8D8;"
-                               "border-left:0px solid #D8D8D8;"
-                               "border-right:1px solid #D8D8D8;"
-                               "border-bottom: 1px solid #D8D8D8;"
-                               "padding:4px;"
-                               "font: bold 18px;"
-                               "background-color: " +
-                               DAOLib::colorBackground().name() +
-                               ";}"
-                               "QTableView{ border : 1px solid #D8D8D8; }");
+  ui->tableView->setStyleSheet(
+      "QHeaderView::section{"
+      "border-top: 0px solid #D8D8D8;"
+      "border-left: 0px solid #D8D8D8;"
+      "border-right: 1px solid #D8D8D8;"
+      "border-bottom: 1px solid #D8D8D8;"
+      "padding: 4px;"
+      "font: bold 18px;"
+      "background-color: " +
+      Cnt::COLOR_BACKGROUND[colorIndex].name() +
+      ";}"
+      "QTableView{ "
+      "border : 1px solid #D8D8D8;" +
+      // Stellen die Farbe des leeren Teils der Tabelle ein
+      "background : " + Cnt::COLOR_BACKGROUND[colorIndex].name() +
+      ";selection-background-color: " +
+      // Ändert die Text- und Hintergrundfarbe der selektierten Zeile der
+      // TableView damit die Markierung beim Fokusverlust sichtbar bleibt.
+      Cnt::COLOR_HIGHLIGHT[colorIndex].name() +
+      ";selection-color: " + Cnt::COLOR_WHITE.name() + ";};");
   // Hintergrundfarbe ändern für das Fenster
-  palette = this->palette();
-  palette.setColor(QPalette::Window, DAOLib::colorBackground());
+  QPalette palette = this->palette();
+  palette.setColor(QPalette::Window, Cnt::COLOR_BACKGROUND[colorIndex]);
   this->setPalette(palette);
 
   auto changeBacgroundColor = [&](QMenu *menu) {
     palette = menu->palette();
-    palette.setColor(menu->backgroundRole(), DAOLib::colorBackground());
+    palette.setColor(menu->backgroundRole(), Cnt::COLOR_BACKGROUND[colorIndex]);
     menu->setPalette(palette);
   };
   // Hintergrundfarbe ändern für Menu
@@ -122,8 +161,12 @@ void MainWindow::setBackgroundColor() {
 void MainWindow::setTableViewModel() {
   // Evtl. vorhandenes QSqlTableModel löschen
   delete model;
+  // Evtl. vorhandenes SortFilterProxyModel löschen
+  delete proxyModel;
 
   model = AngelplaetzeDAO::readAngelplaetzeIntoTableModel(this);
+  // Verwenden ein Proxymodel, um Daten zu suchen
+  proxyModel = new SearchProxyModel(this);
   // Spaltenüberschriften der Tabelle setzen
   model->setHeaderData(model->record().indexOf(Cnt::PATH), Qt::Horizontal,
                        QString());
@@ -148,8 +191,12 @@ void MainWindow::setTableViewModel() {
   // Bilder nur für die PATH-Spalte anzeigen
   ui->tableView->setItemDelegateForColumn(model->record().indexOf(Cnt::PATH),
                                           delegate);
+  // Anfangssuchwerte festlegen
+  proxyModel->setSearchTerm(textSuchen->text());
   // Das Datenmodel zur tableView zuweisen
-  ui->tableView->setModel(model);
+  ui->tableView->setModel(proxyModel);
+
+  proxyModel->setSourceModel(model);
   // Übernahme aller Daten in das Datenmodell
   while (model->canFetchMore())
     model->fetchMore();
@@ -174,7 +221,7 @@ void MainWindow::showTable() {
   ui->tableView->hideColumn(model->record().indexOf(Cnt::PRIMARYKEY));
   // Aktivieren/Deaktivieren der Komponenten, abhängig davon,
   // ob Datensätze gelesen wurden.
-  ui->tableView->setEnabled(model->rowCount());
+  ui->tableView->setEnabled(proxyModel->rowCount());
   ui->actionNdern->setEnabled(ui->tableView->isEnabled());
   ui->actionLschen->setEnabled(ui->tableView->isEnabled());
   ui->actionMarkierterAngelplatz->setEnabled(ui->tableView->isEnabled());
@@ -215,16 +262,19 @@ void MainWindow::showAngelplatzWindow(const qint64 key) {
 }
 
 void MainWindow::deleteEntry(const QModelIndex &index) {
+  // Quellmodellindex
+  auto sourceIndex = proxyModel->mapToSource(index);
   // Ermitteln des Primärschlüssels in Spalte 'PRIMARYKEY' über den als
   // Parameter übergebenen QModelIndex.
-  qint64 key = model->record(index.row()).value(Cnt::PRIMARYKEY).toLongLong();
+  qint64 key =
+      model->record(sourceIndex.row()).value(Cnt::PRIMARYKEY).toLongLong();
 
   QString angelplatzName = AngelplaetzeDAO::readAngelplatzName(key);
 
   int msgValue = QMessageBox::question(
       this, this->windowTitle(),
       tr("Angelplatz löschen: ") +
-          model->record(index.row()).value(Cnt::NAME).toString() +
+          model->record(sourceIndex.row()).value(Cnt::NAME).toString() +
           tr("\nAnzahl der zu löschenden Fische: ") +
           QString::number(FischeDAO::countFischeInAngelplatz(angelplatzName)),
       QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
@@ -302,13 +352,13 @@ void MainWindow::updateTableView(const qint64 key) {
   if (angelplatz == nullptr)
     return;
 
-  QModelIndex currentIndex = ui->tableView->currentIndex();
+  auto sourceIndex = proxyModel->mapToSource(ui->tableView->currentIndex());
 
   QModelIndex index;
 
   auto changeData = [&](QString column, auto data) {
     // Erstellen einen Index, der auf eine bestimmte Spalte zeigt
-    index = model->index(currentIndex.row(), model->record().indexOf(column));
+    index = model->index(sourceIndex.row(), model->record().indexOf(column));
     // Die Variable Column im Datenmodell über den Index ändern
     model->setData(index, QVariant(data), Qt::EditRole);
     // Die TableView informieren, dass die Werte geändert wurde und
@@ -346,6 +396,22 @@ void MainWindow::setColumnAngelplatzWidth(const QList<int> list) {
   angelplatzColWidthList = list;
 }
 
+void MainWindow::onSearch_cancel() {
+
+  textSuchen->setVisible(false);
+
+  cancelButton->setVisible(false);
+  // Löschen den angeforderten Text
+  textSuchen->setText(QString());
+  // Tabelle ohne Filterung anzeigen
+  showTable();
+}
+
+void MainWindow::onTextSuchen_textChanged(const QString &) {
+  // Aktualisieren die Tabellenansicht
+  showTable();
+}
+
 void MainWindow::tableView_selectionChanged() {
   // Anzeigen, welcher Datensatz ausgewählt ist
   statusLabel->setText(
@@ -378,6 +444,15 @@ void MainWindow::loadLanguage(const QString &language) {
     enTranslatorInstalled = QApplication::installTranslator(enTranslator);
     ui->actionEnglisch->setChecked(true);
     currentLanguage = language;
+  } else if (language.toLower() == Cnt::SRB && srbTranslator != nullptr) {
+    // Serbische Systemtexte laden
+    sysLoaded =
+        sysTranslator->load(Cnt::QTBASE_ + language,
+                            QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+    // Übersetzer für Serbisch installieren
+    srbTranslatorInstalled = QApplication::installTranslator(srbTranslator);
+    ui->actionSerBisch->setChecked(true);
+    currentLanguage = language;
   } else {
     // Standardsprache ist Deutsch
     // Deutsche Systemtexte laden
@@ -393,7 +468,7 @@ void MainWindow::loadLanguage(const QString &language) {
 
 void MainWindow::loadBackgroundColor(const int color) {
 
-  DAOLib::setColor(color);
+  StyleBackground::setColorIndex(color);
 
   switch (color) {
   case Cnt::Color::WHITE:
@@ -526,7 +601,7 @@ void MainWindow::writeXMLSettings(const QString &filename) {
                                QString::number(angelplatzColWidthList[i]));
   // Schreiben die ausgewählte Hintergrundfarbe
   xmlWriter.writeTextElement(Cnt::BACKGROUND,
-                             QString::number(DAOLib::getColor()));
+                             QString::number(StyleBackground::getColorIndex()));
   // Beendet den Knoten </Settings>
   xmlWriter.writeEndElement();
 
@@ -591,27 +666,40 @@ void MainWindow::on_actionLschen_triggered() {
   deleteEntry(ui->tableView->currentIndex());
 }
 
+void MainWindow::on_action_Suchen_triggered() {
+
+  cancelButton->setVisible(true);
+
+  textSuchen->setVisible(true);
+
+  textSuchen->setFocus();
+}
+
 void MainWindow::on_actionNdern_triggered() {
 
-  showAngelplatzDialog(model->record(ui->tableView->currentIndex().row())
-                           .value(Cnt::PRIMARYKEY)
-                           .toLongLong());
+  showAngelplatzDialog(
+      model
+          ->record(proxyModel->mapToSource(ui->tableView->currentIndex()).row())
+          .value(Cnt::PRIMARYKEY)
+          .toLongLong());
 }
 
 void MainWindow::on_tableView_doubleClicked(const QModelIndex &index) {
 
-  showAngelplatzWindow(
-      model->record(index.row()).value(Cnt::PRIMARYKEY).toLongLong());
+  showAngelplatzWindow(model->record(proxyModel->mapToSource(index).row())
+                           .value(Cnt::PRIMARYKEY)
+                           .toLongLong());
 }
 
 void MainWindow::on_actionMarkierterAngelplatz_triggered() {
-
   // Über den als Parameter übergebenen QModelIndex der selektierten Zeile
   // den Wert der Spalte PRIMARYKEY ermitten und als Parameter an die
   // Methode showAngelplatzWindow() übergeben.
-  showAngelplatzWindow(model->record(ui->tableView->currentIndex().row())
-                           .value(Cnt::PRIMARYKEY)
-                           .toLongLong());
+  showAngelplatzWindow(
+      model
+          ->record(proxyModel->mapToSource(ui->tableView->currentIndex()).row())
+          .value(Cnt::PRIMARYKEY)
+          .toLongLong());
 }
 
 void MainWindow::on_actionAlleAngelpltze_triggered() {
@@ -633,44 +721,51 @@ void MainWindow::on_actionEnglisch_triggered() {
   showTable();
 }
 
+void MainWindow::on_actionSerBisch_triggered() {
+
+  loadLanguage(Cnt::SRB);
+
+  showTable();
+}
+
 void MainWindow::on_actionWeiss_triggered() {
 
   loadBackgroundColor(Cnt::Color::WHITE);
 
-  setBackgroundColor();
+  setBackgroundColor(Cnt::Color::WHITE);
 }
 
 void MainWindow::on_actionGelb_triggered() {
 
   loadBackgroundColor(Cnt::Color::YELLOW);
 
-  setBackgroundColor();
+  setBackgroundColor(Cnt::Color::YELLOW);
 }
 
 void MainWindow::on_actionGraU_triggered() {
 
   loadBackgroundColor(Cnt::Color::GRAY);
 
-  setBackgroundColor();
+  setBackgroundColor(Cnt::Color::GRAY);
 }
 
 void MainWindow::on_actionGRn_triggered() {
 
   loadBackgroundColor(Cnt::Color::GREEN);
 
-  setBackgroundColor();
+  setBackgroundColor(Cnt::Color::GREEN);
 }
 
 void MainWindow::on_actionRot_triggered() {
 
   loadBackgroundColor(Cnt::Color::RED);
 
-  setBackgroundColor();
+  setBackgroundColor(Cnt::Color::RED);
 }
 
 void MainWindow::on_actionBlau_triggered() {
 
   loadBackgroundColor(Cnt::Color::BLUE);
 
-  setBackgroundColor();
+  setBackgroundColor(Cnt::Color::BLUE);
 }

@@ -112,6 +112,8 @@
     <addaction name="actionNeu"/>
     <addaction name="actionNdern"/>
     <addaction name="actionLschen"/>
+    <addaction name="separator"/>
+    <addaction name="action_Suchen"/>
    </widget>
    <widget class="QMenu" name="menuDaten">
     <property name="title">
@@ -134,10 +136,11 @@
      </property>
      <addaction name="actionDeutsch"/>
      <addaction name="actionEnglisch"/>
+     <addaction name="actionSerBisch"/>
     </widget>
     <widget class="QMenu" name="menuHintergrund">
      <property name="title">
-      <string>&amp;Hintergrund</string>
+      <string>&amp;Thema</string>
      </property>
      <property name="icon">
       <iconset resource="Angeltagebuch.qrc">
@@ -162,7 +165,13 @@
    <property name="minimumSize">
     <size>
      <width>0</width>
-     <height>25</height>
+     <height>40</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>40</height>
     </size>
    </property>
   </widget>
@@ -191,6 +200,8 @@
    <addaction name="actionNeu"/>
    <addaction name="actionNdern"/>
    <addaction name="actionLschen"/>
+   <addaction name="separator"/>
+   <addaction name="action_Suchen"/>
    <addaction name="separator"/>
    <addaction name="actionMarkierterAngelplatz"/>
    <addaction name="actionAlleAngelpltze"/>
@@ -329,6 +340,26 @@
    </property>
    <property name="text">
     <string>&amp;Blau</string>
+   </property>
+  </action>
+  <action name="actionSerBisch">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Ser&amp;bisch</string>
+   </property>
+  </action>
+  <action name="action_Suchen">
+   <property name="icon">
+    <iconset resource="Angeltagebuch.qrc">
+     <normaloff>:/suchen.png</normaloff>:/suchen.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Suchen</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

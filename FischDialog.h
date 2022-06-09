@@ -10,7 +10,7 @@
 #include "Constants.h"
 #include "Fisch.h"
 #include "FischeDAO.h"
-#include "DAOLib.h"
+#include "StyleBackground.h"
 
 namespace Ui {
 class FischDialog;

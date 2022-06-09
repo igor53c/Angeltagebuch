@@ -26,7 +26,7 @@ void AngelplatzDialog::init() {
   ui->textName->setFocus();
   // Hintergrundfarbe ändern
   QPalette palette = this->palette();
-  palette.setColor(QPalette::Window, DAOLib::colorBackground());
+  palette.setColor(QPalette::Window, StyleBackground::colorBackground());
   this->setPalette(palette);
 }
 
@@ -187,8 +187,8 @@ void AngelplatzDialog::importImage() {
 }
 
 void AngelplatzDialog::closeEvent(QCloseEvent *event) {
-    // Prüfen vor dem Beenden, ob die eingegebenen Daten gespeichert werden sollen
-    querySave() ? event->accept() : event->ignore();
+  // Prüfen vor dem Beenden, ob die eingegebenen Daten gespeichert werden sollen
+  querySave() ? event->accept() : event->ignore();
 }
 
 void AngelplatzDialog::reject() { close(); }

@@ -11,5 +11,6 @@
         <file>appIcon.png</file>
         <file>aendern.png</file>
         <file>hintergrund.png</file>
+        <file>suchen.png</file>
     </qresource>
 </RCC>
