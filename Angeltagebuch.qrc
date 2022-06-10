@@ -12,5 +12,6 @@
         <file>hintergrund.png</file>
         <file>suchen.png</file>
         <file>beenden.png</file>
+        <file>icon.ico</file>
     </qresource>
 </RCC>

@@ -9,7 +9,7 @@ bool SearchProxyModel::filterAcceptsRow(
   if (searchTerm.isEmpty())
     return true;
   // Ob der Suchbegriff in einer Spalte steht
-  for (int i = 0; i <= Cnt::Angelplaetze::A_INFO; i++)
+  for (int i = Cnt::Angelplaetze::A_NAME; i <= Cnt::Angelplaetze::A_INFO; i++)
     if (sourceModel()
             ->data(sourceModel()->index(source_row, i, source_parent))
             .toString()
